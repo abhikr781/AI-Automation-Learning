@@ -1,0 +1,119 @@
+{
+  "name": "Day-04",
+  "nodes": [
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Give me a detailed report on {{ $json.chatInput }}\n\nMake sure the 'key_points' field is returned as a list containing exactly 5 bullet points or separate elements, not as a single paragraph. ",
+        "hasOutputParser": true,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        416,
+        0
+      ],
+      "id": "42a1f00e-7319-42c9-856e-99bab7646aab",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "model": "llama-3.3-70b-versatile",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+      "typeVersion": 1,
+      "position": [
+        288,
+        208
+      ],
+      "id": "971f9a4e-46b5-48dd-8795-00542fd36ca6",
+      "name": "Groq Chat Model",
+      "credentials": {
+        "groqApi": {
+          "id": "CB8kxUabAEQDF8fo",
+          "name": "Groq account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "schemaType": "manual",
+        "inputSchema": "{\n  \"company_overview\": \"...\",\n  \"business\": \"...\",\n  \"key_points\": \"Provide exactly 5 key important points about the company, formatted as a numbered list from 1 to 5 separated by newlines.\"\n}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        592,
+        208
+      ],
+      "id": "b41d8457-833c-43df-91c1-dce1dcd62f28",
+      "name": "Structured Output Parser"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.4,
+      "position": [
+        0,
+        0
+      ],
+      "id": "43dcf094-d0bb-4306-ab5a-8ebf153671de",
+      "name": "When chat message received",
+      "webhookId": "be596a6d-b02c-4936-817f-ff6d86231b88"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Groq Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "ccc7adf4-76e4-4849-a1e4-3a56fce816ce",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "8bf29fe464bb8cd02a1ac56721c6ca3d51cb4ba18d6562b71ce2f156ceee241f"
+  },
+  "nodeGroups": [],
+  "id": "KpxH6Ul1BfZSvu07",
+  "tags": []
+}
