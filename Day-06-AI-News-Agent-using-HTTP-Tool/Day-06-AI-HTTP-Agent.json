@@ -1,0 +1,216 @@
+{
+  "name": "Day-06-AI-HTTP-Agent",
+  "nodes": [
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.4,
+      "position": [
+        0,
+        0
+      ],
+      "id": "a933eafc-7cb5-4599-81b5-9b06517fcdf3",
+      "name": "When chat message received",
+      "webhookId": "888f4f6a-f0b3-45ff-93a8-86c4f48c40f4"
+    },
+    {
+      "parameters": {
+        "options": {
+          "systemMessage": "If the user asks for latest news about any company, stock, ETF, crypto or topic,\nextract only the company/topic name and send it to the Get News tool.\n\nExamples:\n\nLatest news about Reliance\n→ Reliance\n\nShare Tata Motors latest news\n→ Tata Motors\n\nTesla News\n→ Tesla\n\nBitcoin latest news\n→ Bitcoin\n\nOnly send the extracted search term."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        208,
+        0
+      ],
+      "id": "da852c9c-b719-41ce-9f59-907d4c4a37b7",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.toolWikipedia",
+      "typeVersion": 1,
+      "position": [
+        416,
+        256
+      ],
+      "id": "35b81d0f-cf33-4a89-b36b-988c0eca5e16",
+      "name": "Wikipedia"
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.toolCalculator",
+      "typeVersion": 1,
+      "position": [
+        528,
+        304
+      ],
+      "id": "45e7430a-e044-4ba6-9e85-5443297e5b3d",
+      "name": "Calculator"
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.4,
+      "position": [
+        256,
+        208
+      ],
+      "id": "6022ee16-6fec-4e8a-9b33-1c0014d3a482",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list",
+          "cachedResultName": "gpt-4o-mini"
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        80,
+        208
+      ],
+      "id": "18b9a293-af6c-4861-a2bd-92885c779765",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "63JHN9u8uhhDSAcx",
+          "name": "OpenAI account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "toolDescription": "Use this tool to fetch live financial, stock market, and latest company news updates",
+        "url": "https://newsdata.io/api/1/latest",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "apikey",
+              "value": "=pub_579fb27d27674b5299d31e1291493f05"
+            },
+            {
+              "name": "language",
+              "value": "en"
+            },
+            {
+              "name": "category",
+              "value": "business"
+            },
+            {
+              "name": "size",
+              "value": "3"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequestTool",
+      "typeVersion": 4.4,
+      "position": [
+        752,
+        192
+      ],
+      "id": "652ec94f-1840-4e7c-a72f-d771cca31772",
+      "name": "http-Get-News"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wikipedia": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Calculator": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        []
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "http-Get-News": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "fbd7b95f-01fd-4336-9fa3-1f3850d63e9b",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "8bf29fe464bb8cd02a1ac56721c6ca3d51cb4ba18d6562b71ce2f156ceee241f"
+  },
+  "nodeGroups": [],
+  "id": "n0hcekD20AhVOKhs",
+  "tags": []
+}
