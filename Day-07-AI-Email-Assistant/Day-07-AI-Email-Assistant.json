@@ -1,0 +1,98 @@
+{
+  "name": "Day-07-AI-Email-Assistant",
+  "nodes": [
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list",
+          "cachedResultName": "gpt-4o-mini"
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        96,
+        272
+      ],
+      "id": "c055d811-ff14-4392-a4c1-151124e70cc3",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "63JHN9u8uhhDSAcx",
+          "name": "OpenAI account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.4,
+      "position": [
+        -48,
+        16
+      ],
+      "id": "eceb5af2-bc2e-4386-8952-435d83e19c85",
+      "name": "When chat message received",
+      "webhookId": "3a64f309-e81d-4804-ac07-a0d7cc2c2b1b"
+    },
+    {
+      "parameters": {
+        "options": {
+          "systemMessage": "You are an expert Email Writing Assistant.\n\nYour task is to write professional, well-structured emails.\n\nRules:\n\n- Always generate a meaningful subject.\n- Use a proper greeting.\n- Write a complete email body.\n- Add a professional closing.\n- Use realistic examples instead of placeholders whenever possible.\n- If the user does not provide dates or names, make reasonable assumptions.\n- Never write things like [Your Name], [Manager Name], [Start Date], etc.\n- Keep the tone professional unless the user requests otherwise.\n- Return only the final email.\n- If the recipient's name is not provided, use \"Dear Sir/Madam\" instead of generating a random name."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        160,
+        16
+      ],
+      "id": "484ce40e-7ad5-4080-b520-e3e33ad3fd81",
+      "name": "AI Agent"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "87ed76b1-6895-4dd9-836c-a30f6d301207",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "8bf29fe464bb8cd02a1ac56721c6ca3d51cb4ba18d6562b71ce2f156ceee241f"
+  },
+  "nodeGroups": [],
+  "id": "qjZuY2uNMZWgqsnj",
+  "tags": []
+}
