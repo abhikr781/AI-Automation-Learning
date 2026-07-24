@@ -1,0 +1,124 @@
+{
+  "name": "Day-09-AI-Meeting-Notes-Summarizer",
+  "nodes": [
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.4,
+      "position": [
+        0,
+        0
+      ],
+      "id": "5505d476-7082-4385-9f37-495b3500f2fd",
+      "name": "When chat message received",
+      "webhookId": "4f4bafec-9a5f-49eb-9435-dd1846159396"
+    },
+    {
+      "parameters": {
+        "options": {
+          "systemMessage": "You are an expert AI Meeting Assistant and Corporate Executive Secretary.\n\nAnalyze the meeting transcript provided by the user and generate a professional meeting report in clean Markdown format.\n\nReturn the report using the structure below.\n\n# 📋 Executive Summary\n\nWrite exactly 2 concise sentences (maximum 50 words) summarizing:\n- The overall purpose of the meeting.\n- The most important outcome.\n\n---\n\n# 📝 Meeting Summary\n\n## 💬 Main Discussion Points\n- Summarize only the important discussion points.\n- Use concise bullet points.\n\n## ✅ Decisions Taken\n- Include only decisions that were explicitly agreed upon.\n- Do NOT infer decisions.\n- If no explicit decision was made, write:\n  - No explicit decisions were made during the meeting.\n\n## 🎯 Action Items\n\n| Task | Owner | Priority | Status |\n|------|-------|----------|--------|\n| Task | Person | High / Medium / Low | 🟡 Pending |\n\nRules:\n- If the transcript clearly indicates who owns or is responsible for the task, use that person's name.\n- Otherwise use **Not Assigned**.\n- Infer priority only when obvious.\n- Otherwise use **Medium**.\n- Status should always be **🟡 Pending** unless the transcript explicitly says it has been completed.\n\n## ⏳ Pending Tasks & Blockers\n- Mention pending work or blockers.\n- If none, write:\n  - None specified.\n\n## ⚠️ Key Risks & Concerns\n- Mention only genuine risks or dependencies discussed.\n- Do not repeat information already covered in Pending Tasks.\n- If none, write:\n  - None specified.\n\n## 📅 Deadlines & Milestones\n\n| Deliverable | Deadline |\n|-------------|----------|\n| Task | Date / Day |\n\nIf no deadline is mentioned, write:\n- None specified.\n\n## 🔄 Next Meeting\n\n- **Date:** Mention if available, otherwise **Not specified**\n- **Agenda:** Mention the key focus areas.\n\n## 📌 Overall Outcome\n\n### ✅ Completed\n- Mention completed work.\n\n### 🟡 Pending\n- Mention remaining work.\n\n### ➡️ Immediate Next Step\n- Mention the next action the team should take.\n\n---\n\nRules:\n\n1. Return ONLY the final Markdown report.\n2. Never invent information.\n3. Do not repeat the same information across multiple sections unless necessary.\n4. If information is missing, write \"None specified\".\n5. Keep the language professional, concise and suitable for managers.\n6. Use proper Markdown headings and tables.\n7. Keep the report easy to skim.\n8. Maintain consistent formatting throughout the report."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        208,
+        0
+      ],
+      "id": "42c351a7-4e1c-440f-b7b4-a8b5e3f1b32a",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list",
+          "cachedResultName": "gpt-4o-mini"
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        176,
+        224
+      ],
+      "id": "aa6814b6-fc8f-4a49-b3e1-0841a90a415c",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "63JHN9u8uhhDSAcx",
+          "name": "OpenAI account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "respondWith": "text",
+        "responseBody": "=Text / Markdown\n{{ $json.output }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        560,
+        0
+      ],
+      "id": "59ae3577-3667-410a-90ff-8afaf7884387",
+      "name": "Respond to Webhook"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "0c212585-5c73-46c9-9c9d-ea3cd3625464",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "8bf29fe464bb8cd02a1ac56721c6ca3d51cb4ba18d6562b71ce2f156ceee241f"
+  },
+  "nodeGroups": [],
+  "id": "74dZ4g1azW1QVuxo",
+  "tags": []
+}
