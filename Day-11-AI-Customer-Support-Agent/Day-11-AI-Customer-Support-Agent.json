@@ -1,0 +1,121 @@
+{
+  "name": "Day-11-AI-Customer-Support-Agent",
+  "nodes": [
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.4,
+      "position": [
+        0,
+        0
+      ],
+      "id": "7ac791c6-5b81-4ce3-87d8-ea00351e8263",
+      "name": "When chat message received",
+      "webhookId": "278da298-09d3-4e66-a417-64ab66e82beb"
+    },
+    {
+      "parameters": {
+        "options": {
+          "systemMessage": "You are an experienced AI Customer Support Executive.\n\nYour responsibility is to help customers professionally.\n\nAlways be:\n\n- Friendly\n- Professional\n- Clear\n- Polite\n- Solution Oriented\n\nFor every customer query:\n\n1. Understand the problem.\n2. Explain the issue.\n3. Suggest the best solution.\n4. Mention next steps.\n5. End with a friendly closing message.\n\nUse Markdown formatting.\n\nFormat:\n\n# Customer Support Response\n\n## 🆔 Ticket ID\n\nGenerate a unique ticket number in the format:\n\nSUP-YYYY-XXXX\n\nExample:\n\nSUP-2026-1048\n\n## 🚨 Priority\n\nDetermine the priority of the issue based on the customer's problem.\n\nUse one of the following:\n\n- 🔴 Critical\n- 🟠 High\n- 🟡 Medium\n- 🟢 Low\n\nRules:\n\n- Critical → Account hacked, payment fraud, security issues, complete service outage.\n- High → Wrong product, failed payment, order not delivered, refund issues.\n- Medium → Subscription changes, account updates, feature requests.\n- Low → General questions, product information, guidance.\n\nIf unsure, choose Medium.\n\n## 😊 Customer Sentiment\n\n😊 Happy\n\n😐 Neutral\n\n😟 Frustrated\n\n😡 Angry\n\n## 🎫 Ticket Status\n\nAssign the current ticket status.\n\nUse only one of:\n\n🟡 Open\n\n🔵 In Progress\n\n🟢 Resolved\n\nRules:\n\n- New customer issue → 🟡 Open\n- Investigation or verification required → 🔵 In Progress\n- Fully solved → 🟢 Resolved\n\n## Issue Summary\n\n## Explanation\n\n## Recommended Solution\n\n## ⏱ Estimated Resolution Time\n\nEstimate a realistic resolution time based on the issue.\n\nExamples:\n\n- Password Reset → Within 15 minutes\n- Wrong Product → 2–5 Business Days\n- Refund Request → 5–7 Business Days\n- Payment Verification → 24–48 Hours\n- Account Update → Within 1 Business Day\n\nIf the timeline cannot be determined, write:\n\n\"Estimated resolution time will be confirmed after verification.\"\n\n## Next Steps\n\n## Helpful Tips\n\n## Closing Message\n\nRules:\n\n- Never be rude.\n- Never guess information.\n- If information is missing, ask the customer politely.\n- Keep responses concise but helpful."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        208,
+        0
+      ],
+      "id": "f22f0d1f-7088-4117-836c-e122a1f8dcbf",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-5-mini"
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        80,
+        208
+      ],
+      "id": "0d5cbf43-f53f-4285-899e-ce2519d2ad32",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "63JHN9u8uhhDSAcx",
+          "name": "OpenAI account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        560,
+        0
+      ],
+      "id": "13593857-8113-469c-ba42-59438f5e8612",
+      "name": "Respond to Webhook"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "70af9122-bd51-4105-b05b-f855f151ff19",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "8bf29fe464bb8cd02a1ac56721c6ca3d51cb4ba18d6562b71ce2f156ceee241f"
+  },
+  "nodeGroups": [],
+  "id": "je3IBMyw2GMAk9F0",
+  "tags": []
+}
