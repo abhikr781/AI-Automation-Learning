@@ -1,0 +1,149 @@
+{
+  "name": "Day-10-AI-Research-Assistant",
+  "nodes": [
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.4,
+      "position": [
+        0,
+        0
+      ],
+      "id": "dfe13da8-1b99-4b29-b629-21218f3c6a86",
+      "name": "When chat message received",
+      "webhookId": "05ecf667-c831-4990-b6b4-7a08dbdba1f1"
+    },
+    {
+      "parameters": {
+        "options": {
+          "systemMessage": "You are an AI Research Assistant.\n\nWhenever the user asks for latest news,\nalways use the News Tool.\n\nAfter getting results:\n\nCreate\n\nExecutive Summary\n\nTop Headlines\n\nShort Summary\n\nImportant Insights\n\nSource Links\n\nReturn clean markdown.\n\nNever answer from your own knowledge when latest information is requested.\n\nAlways use the tool."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        208,
+        0
+      ],
+      "id": "ab22b02f-233b-4af0-ae21-1345d25751a3",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list",
+          "cachedResultName": "gpt-4o-mini"
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        80,
+        208
+      ],
+      "id": "e5471e45-cccd-42e2-bcf5-2d267ad7a753",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "63JHN9u8uhhDSAcx",
+          "name": "OpenAI account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "toolDescription": "Search latest news from internet.\n\nInput:\nSearch keyword\n\nOutput:\nJSON list of latest news.",
+        "url": "https://gnews.io/api/v4/search",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "q",
+              "value": "={{$fromAI(\"query\")}}"
+            },
+            {
+              "name": "lang",
+              "value": "lang=en"
+            },
+            {
+              "name": "country",
+              "value": "country=in"
+            },
+            {
+              "name": "max",
+              "value": "max=5"
+            },
+            {
+              "name": "apikey",
+              "value": "6c0e863bc258187a4e22fca56f6537fe"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequestTool",
+      "typeVersion": 4.4,
+      "position": [
+        368,
+        208
+      ],
+      "id": "32df7dc5-380a-4774-98c9-83c0add6b525",
+      "name": "HTTP Request"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "9c7e0147-f3fe-4f11-940d-26608520be09",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "8bf29fe464bb8cd02a1ac56721c6ca3d51cb4ba18d6562b71ce2f156ceee241f"
+  },
+  "nodeGroups": [],
+  "id": "zj4QKmiFW6wi12b5",
+  "tags": []
+}
