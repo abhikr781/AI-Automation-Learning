@@ -1,0 +1,492 @@
+{
+  "name": "Day 15 – Multi-Agent AI Customer Support System",
+  "nodes": [
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "maxResults": 1,
+        "filters": {}
+      },
+      "type": "n8n-nodes-base.gmailTrigger",
+      "typeVersion": 1.4,
+      "position": [
+        0,
+        0
+      ],
+      "id": "b4a11536-a516-48ee-91c5-763e08eeabc7",
+      "name": "Gmail Trigger",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "XYe3V63WVqSRCG5n",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=You are an Email Classification Agent.\n\nAnalyze the customer's email.\nEmail Subject: {{ $json.Subject }}\nEmail Body: {{ $json.snippet }}\n\nReturn ONLY valid JSON.\n\nExtract:\n- category\n- priority\n- sentiment\n\nCategories:\nSales\nSupport\nHR\nGeneral\nSpam\n\nPriority:\nHigh\nMedium\nLow\n\nSentiment:\nPositive\nNeutral\nNegative\n\nNever generate a reply.\nNever explain.\nReturn JSON only.",
+        "hasOutputParser": true,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        208,
+        0
+      ],
+      "id": "71602438-4503-417f-b70d-6cb53a211cf0",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list",
+          "cachedResultName": "gpt-4o-mini"
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        144,
+        256
+      ],
+      "id": "da90dd03-ca6f-40b9-b131-1b9ddd25aa5a",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "63JHN9u8uhhDSAcx",
+          "name": "OpenAI account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "schemaType": "manual",
+        "inputSchema": "{\n  \"type\": \"object\",\n  \"properties\": {\n    \"category\": { \"type\": \"string\" },\n    \"priority\": { \"type\": \"string\" },\n    \"sentiment\": { \"type\": \"string\" }\n  }\n}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        352,
+        256
+      ],
+      "id": "27b1e188-f9ad-4a91-b0d2-c2c92e0dfa45",
+      "name": "Structured Output Parser"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.output.category }}",
+                    "rightValue": "Sales",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "1ff4d8d5-3ec3-43e1-a04c-47137aa8ac13"
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "d79ae8a4-ee89-4beb-bcc0-b5948de73fe8",
+                    "leftValue": "={{ $json.output.category }}",
+                    "rightValue": "Support",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "06310bea-ed40-4aca-9964-0fbc04b67042",
+                    "leftValue": "={{ $json.output.category }}",
+                    "rightValue": "HR",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "5e766ceb-00eb-4f44-9cd1-73940b2a74b0",
+                    "leftValue": "={{ $json.output.category }}",
+                    "rightValue": "General",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "1660bbcd-4154-4926-87ae-34fb586524bf",
+                    "leftValue": "={{ $json.output.category }}",
+                    "rightValue": "Spam",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        560,
+        -16
+      ],
+      "id": "84ba8d34-05c5-4e06-aa51-a34d53364d16",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=You are an Information Extraction Agent.\n\nRead the email text below:\nSubject: {{ $('Gmail Trigger').item.json.Subject }}\nBody: {{ $('Gmail Trigger').item.json.snippet }}\n\nExtract ONLY the following information.\n\nFields:\n- customer_name\n- company\n- phone\n- email\n- main_issue\n- summary\n\nRules:\n- Never guess.\n- If a field is unavailable, return null.",
+        "hasOutputParser": true,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        832,
+        32
+      ],
+      "id": "44775255-752e-40ef-a806-a95e4f5108ba",
+      "name": "AI Agent1"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list",
+          "cachedResultName": "gpt-4o-mini"
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        752,
+        256
+      ],
+      "id": "1b1555aa-427a-4451-867d-89e3969f91e2",
+      "name": "OpenAI Chat Model1",
+      "credentials": {
+        "openAiApi": {
+          "id": "63JHN9u8uhhDSAcx",
+          "name": "OpenAI account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "schemaType": "manual",
+        "inputSchema": "{\n  \"type\": \"object\",\n  \"properties\": {\n    \"customer_name\": { \"type\": [\"string\", \"null\"] },\n    \"company\": { \"type\": [\"string\", \"null\"] },\n    \"phone\": { \"type\": [\"string\", \"null\"] },\n    \"email\": { \"type\": [\"string\", \"null\"] },\n    \"main_issue\": { \"type\": \"string\" },\n    \"summary\": { \"type\": \"string\" }\n  }\n  }"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        976,
+        240
+      ],
+      "id": "84e454ae-0af7-49f9-b695-2063865b0250",
+      "name": "Structured Output Parser1"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=You are an experienced Customer Support Executive representing ABC Technologies. \n\nCustomer Name: {{ $json.output.customer_name }} \nCustomer Issue: {{ $json.output.main_issue }} \nIssue Summary: {{ $json.output.summary }} \n\nWrite ONLY the email body. \n\nGuidelines: \n- Be professional, friendly, and empathetic. \n- Acknowledge the customer's request naturally. \n- Provide a concise and helpful response. \n- Keep the response under 120 words. \n- Use short paragraphs with proper spacing for readability. \n- If the customer's name is available, start with \"Hello <Customer Name>,\". \n- If the customer's name is unavailable, start with \"Hello,\". \n- Never include a Subject line. \n- Never use placeholders such as [Customer Name]. \n- Never use Markdown, HTML, or code blocks. \n- Never explain your response. \n- Never mention the customer's budget unless it is directly relevant. \n- Do not repeat information unnecessarily. \n- End the email with: \n- If the customer's request requires further discussion, politely invite them to reply to this email for additional details. \n-Tailor the response to the customer's specific request. Do not use generic sentences that may not apply to every email. \n-If enough information is already available, do not ask unnecessary follow-up questions. Only request additional information if it is genuinely required. \n- Avoid generic AI phrases such as: \n- We understand... \n- We are here to assist... \n- Thank you for reaching out... \n\nInstead, write naturally based on the customer's actual request. \n\nBest Regards, \nABC Technologies \n\nReturn ONLY the email body.",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        1152,
+        32
+      ],
+      "id": "71452247-092a-4322-91a1-f4c31f88f4bb",
+      "name": "AI Agent2"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list",
+          "cachedResultName": "gpt-4o-mini"
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        1152,
+        256
+      ],
+      "id": "a4dbd55d-0517-453f-81c0-4978b1072f26",
+      "name": "OpenAI Chat Model2",
+      "credentials": {
+        "openAiApi": {
+          "id": "63JHN9u8uhhDSAcx",
+          "name": "OpenAI account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $('Gmail Trigger').item.json.From }}",
+        "subject": "=Re: {{ $('Gmail Trigger').item.json.Subject }}",
+        "emailType": "text",
+        "message": "={{ $json.output }}",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        1456,
+        32
+      ],
+      "id": "8f3042e9-0bc1-4025-9b98-226d7e9df39d",
+      "name": "Send a message",
+      "webhookId": "d74e3c10-5af8-41f6-903b-8f11584f8718",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "XYe3V63WVqSRCG5n",
+          "name": "Gmail account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Gmail Trigger": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "AI Agent1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "AI Agent1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "AI Agent1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "AI Agent1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser1": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent1": {
+      "main": [
+        [
+          {
+            "node": "AI Agent2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model2": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent2",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent2": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "1c40db95-4d30-42eb-961c-ee4e9dfd6d24",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "8bf29fe464bb8cd02a1ac56721c6ca3d51cb4ba18d6562b71ce2f156ceee241f"
+  },
+  "nodeGroups": [],
+  "id": "AWE3tjUDMmYzebJO",
+  "tags": []
+}
