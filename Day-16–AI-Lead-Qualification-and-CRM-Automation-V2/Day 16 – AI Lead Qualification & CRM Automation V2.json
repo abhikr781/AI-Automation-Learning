@@ -1,0 +1,457 @@
+{
+  "name": "Day 16 – AI Lead Qualification & CRM Automation V2",
+  "nodes": [
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "449f1aae-9e8d-4cba-963b-7a327ba82beb",
+              "name": "name:",
+              "value": "",
+              "type": "string"
+            },
+            {
+              "id": "b4104db0-32dc-4817-a5b7-7981fa61255a",
+              "name": "company:",
+              "value": "",
+              "type": "string"
+            },
+            {
+              "id": "8e0a20c0-f874-43a4-af73-17c98d7c91f8",
+              "name": "email:",
+              "value": "hello@example.com",
+              "type": "string"
+            },
+            {
+              "id": "b994c0c3-a0eb-43aa-8030-06353130a807",
+              "name": "=budget:",
+              "value": "Budget ₹12 lakh.",
+              "type": "string"
+            },
+            {
+              "id": "5b769772-c258-4a2a-afda-da5cfe4f4c9e",
+              "name": "timeline:",
+              "value": "2 years",
+              "type": "string"
+            },
+            {
+              "id": "c1f8c2b0-a133-4a41-aa64-963b15890f44",
+              "name": "requirement:",
+              "value": "Need AI Automation.  Budget ₹12 lakh.  Need deployment in Dubai.  Need support for 2 years.  Can we schedule a call tomorrow?",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        128,
+        -128
+      ],
+      "id": "119a0e6d-b064-453b-a352-e9261ae9a5e5",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=You are a Senior Sales Qualification Specialist.\n\nAnalyze the following lead details:\n{{ JSON.stringify($json, null, 2) }}\n\n### CORE OBJECTIVES & EXTRACTION RULES:\n\n1. Name: Extract the lead/contact name if mentioned in greetings or signatures (e.g., \"Hi, I am Rahul\" -> \"Rahul\"). If missing, set as null.\n2. Company: Extract the company name or business domain/industry (e.g., \"finance company\"). If missing, set as null.\n3. Budget: ALWAYS extract and convert the budget into a pure numeric integer value in INR (e.g., convert '12 lakh' to 1200000, '15 lakh' to 1500000, '50k' to 50000, '2.5 Cr' to 2500000). If no budget is specified, set as null.\n4. Requirement: Provide a clear summary of what the lead needs (e.g., \"Need AI Automation for finance company\").\n5. Timeline Rules:\n   - Extract any delivery timeframe, urgency, or support/maintenance period mentioned in the input.\n   - If user mentions support/maintenance (e.g., \"Need support for 2 years\"), output: \"Support for 2 years\".\n   - If user mentions delivery speed (e.g., \"Need in 2 weeks\"), output: \"2 weeks\".\n   - If urgency or immediate start is requested (e.g., \"Can we start immediately?\"), combine/output accordingly (e.g., \"2 weeks (Start immediately)\").\n   - If no duration or timeframe is mentioned at all, set as \"Not specified\".\n\n---\n\n### SCORING & EVALUATION CRITERIA:\n\nEvaluate the lead on a scale of 0 to 100 based on these four parameters:\n\n1. Budget:\n   - ₹10L+ → High Score contribution\n   - ₹5L–₹10L → Medium Score contribution\n   - Below ₹1L → Low Score contribution\n\n2. Timeline:\n   - Immediate / Urgent / Short delivery time → High Score contribution\n   - 3 Months or longer → Medium/Low Score contribution\n\n3. Requirement Clarity:\n   - Clear and specific scope → High Score contribution\n   - Vague / General inquiry → Low Score contribution\n\n4. Buying Intent:\n   - Asks for call / meeting / immediate onboarding → High Score contribution\n   - Only asking price or generic info → Low Score contribution\n\n---\n\n### PRIORITY & ACTION MAPPING:\n\n- Priority Rules:\n  * If lead_quality is \"Hot\" (Score >= 80) → set priority to \"P1\"\n  * If lead_quality is \"Warm\" (Score 50–79) → set priority to \"P2\"\n  * If lead_quality is \"Cold\" (Score < 50) → set priority to \"P3\"\n\n- Recommended Action (Select EXACTLY ONE):\n  * CALL IMMEDIATELY\n  * SCHEDULE MEETING\n  * SEND PROPOSAL\n  * FOLLOW UP\n  * REQUEST MORE INFO",
+        "hasOutputParser": true,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        464,
+        0
+      ],
+      "id": "7e5cd8fa-5848-454e-befa-4b029a094c2f",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list",
+          "cachedResultName": "gpt-4o-mini"
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        368,
+        224
+      ],
+      "id": "5340312f-0fe6-4a9e-a95b-f3ea533bc098",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "63JHN9u8uhhDSAcx",
+          "name": "OpenAI account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "schemaType": "manual",
+        "inputSchema": "={\n  \"type\": \"object\",\n  \"properties\": {\n    \"name\": {\n      \"type\": [\"string\", \"null\"],\n      \"description\": \"Extracted contact/lead name (e.g. Rahul) or null if missing\"\n    },\n    \"company\": {\n      \"type\": [\"string\", \"null\"],\n      \"description\": \"Extracted company name or industry/domain (e.g. Finance company) or null if missing\"\n    },\n    \"budget\": {\n      \"type\": [\"number\", \"null\"],\n      \"description\": \"Numeric budget integer value in INR (e.g. 1500000 for 15 lakh)\"\n    },\n    \"timeline\": {\n      \"type\": [\"string\", \"null\"],\n      \"description\": \"Extracted timeline, urgency, or support duration (e.g. '2 weeks (Start immediately)', 'Support for 2 years', or 'Not specified')\"\n    },\n    \"requirement\": {\n      \"type\": [\"string\", \"null\"],\n      \"description\": \"Concise summary of project requirements\"\n    },\n    \"lead_score\": {\n      \"type\": \"number\",\n      \"description\": \"Qualification score between 0 and 100\"\n    },\n    \"lead_quality\": {\n      \"type\": \"string\",\n      \"enum\": [\"Hot\", \"Warm\", \"Cold\"]\n    },\n    \"priority\": {\n      \"type\": \"string\",\n      \"enum\": [\"P1\", \"P2\", \"P3\"],\n      \"description\": \"P1 for Hot leads (>=80), P2 for Warm (50-79), P3 for Cold (<50)\"\n    },\n    \"reason\": {\n      \"type\": \"string\",\n      \"description\": \"Brief explanation of why this score and priority were assigned\"\n    },\n    \"recommended_action\": {\n      \"type\": \"string\",\n      \"enum\": [\"CALL IMMEDIATELY\", \"SCHEDULE MEETING\", \"SEND PROPOSAL\", \"FOLLOW UP\", \"REQUEST MORE INFO\"]\n    }\n  },\n  \"required\": [\"lead_score\", \"lead_quality\", \"priority\", \"reason\", \"recommended_action\"]\n}",
+        "autoFix": "={{ false }}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        608,
+        240
+      ],
+      "id": "29729f18-31f5-44b4-907c-21aaf9f1e41d",
+      "name": "Structured Output Parser"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "8849f24c-947d-45dc-837f-d95b81e2ce52",
+              "leftValue": "={{ $json.output.lead_score }}",
+              "rightValue": 80,
+              "operator": {
+                "type": "number",
+                "operation": "gte"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        768,
+        0
+      ],
+      "id": "aaf5de88-44c7-4ef4-9d01-7fafaba88d7c",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1buCNT7H-0h4sIgidLsQg0yN9Bi_il_OL4NGF5H6nm4E",
+          "mode": "list",
+          "cachedResultName": "AI Lead for CRM Automation",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1buCNT7H-0h4sIgidLsQg0yN9Bi_il_OL4NGF5H6nm4E/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1buCNT7H-0h4sIgidLsQg0yN9Bi_il_OL4NGF5H6nm4E/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Name": "={{ $json.output.name || 'Not provided'}}",
+            "Company": "={{ $json.output.company || 'Not provided' }}",
+            "Budget": "={{ $json.output.budget }}",
+            "Timeline": "={{ $json.output.timeline }}",
+            "Requirement": "={{ $json.output.requirement }}",
+            "Lead Score": "={{ $('AI Agent').item.json.output.lead_score }}",
+            "Lead Quality": "={{ $('AI Agent').item.json.output.lead_quality }}",
+            "Reason": "={{ $('AI Agent').item.json.output.reason }}",
+            "Recommended Action": "={{ $('AI Agent').item.json.output.recommended_action }}",
+            "Date": "={{ $today }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Date",
+              "displayName": "Date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Name",
+              "displayName": "Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Company",
+              "displayName": "Company",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Email",
+              "displayName": "Email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Budget",
+              "displayName": "Budget",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Timeline",
+              "displayName": "Timeline",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Requirement",
+              "displayName": "Requirement",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Lead Score",
+              "displayName": "Lead Score",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Lead Quality",
+              "displayName": "Lead Quality",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Reason",
+              "displayName": "Reason",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Recommended Action",
+              "displayName": "Recommended Action",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1024,
+        -16
+      ],
+      "id": "1e89c644-f191-44cf-af44-0cf38fbbeb36",
+      "name": "Append row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "Jyfp3FGZMg8wAD3e",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -64,
+        -128
+      ],
+      "id": "9b29d696-9006-4f3a-8874-d6169b81e66f",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "chatId": "1239935064",
+        "text": "=🔥 New Hot Lead Received\n\n⚡ Priority: {{ $json.Priority || $json.output?.priority || $('AI Agent').item.json.output?.priority || 'P1' }}\n\n👤 Name: {{ $json.Name }}\n\n🏢 Company: {{ $json.Company }}\n\n💰 Budget: {{ $json.Budget ? (($json.Budget.toString().replace(/[^0-9.]/g, '') !== '') ? '₹' + (Number($json.Budget.toString().replace(/[^0-9.]/g, '')) * ($json.Budget.toString().toLowerCase().includes('lakh') ? 100000 : $json.Budget.toString().toLowerCase().includes('cr') ? 10000000 : $json.Budget.toString().toLowerCase().includes('k') ? 1000 : 1)).toLocaleString('en-IN') : $json.Budget) : 'Not provided' }}\n\n⭐ Lead Score: {{ $('AI Agent').item.json.output.lead_score }}/100\n\n📝 Requirement: {{ $json.Requirement }}\n\n📅 Timeline: {{ $('AI Agent').item.json.output.timeline }}\n\n📌 Recommended Action: {{ $json['Recommended Action'] }}\n\n💡Reason: {{ $('AI Agent').item.json.output.reason }}\n\nGenerated by AI Lead Qualification System",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1280,
+        -16
+      ],
+      "id": "be414cf8-def6-4706-98af-228c1df68179",
+      "name": "Send a text message",
+      "webhookId": "ddb4cc65-fce9-4ce4-af2d-f5136c09ae18",
+      "credentials": {
+        "telegramApi": {
+          "id": "svR1CV7IfKrg6pyR",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.4,
+      "position": [
+        144,
+        80
+      ],
+      "id": "9c7e008e-29df-4788-9b07-36187a41dfdf",
+      "name": "When chat message received",
+      "webhookId": "709ae3ac-f3d5-416c-9728-e6d6c2625c95"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Edit Fields": {
+      "main": [
+        []
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Append row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Append row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Append row in sheet": {
+      "main": [
+        [
+          {
+            "node": "Send a text message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "9281e7e2-3d6b-4972-8d6d-7217e8b9dd46",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "8bf29fe464bb8cd02a1ac56721c6ca3d51cb4ba18d6562b71ce2f156ceee241f"
+  },
+  "nodeGroups": [],
+  "id": "MUWEo0q9LJKRUIOO",
+  "tags": []
+}
