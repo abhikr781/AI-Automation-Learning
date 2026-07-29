@@ -1,0 +1,431 @@
+{
+  "name": "Day 16 – AI Lead Qualification & CRM Automation V1",
+  "nodes": [
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "449f1aae-9e8d-4cba-963b-7a327ba82beb",
+              "name": "name:",
+              "value": "",
+              "type": "string"
+            },
+            {
+              "id": "b4104db0-32dc-4817-a5b7-7981fa61255a",
+              "name": "company:",
+              "value": "",
+              "type": "string"
+            },
+            {
+              "id": "8e0a20c0-f874-43a4-af73-17c98d7c91f8",
+              "name": "email:",
+              "value": "hello@example.com",
+              "type": "string"
+            },
+            {
+              "id": "b994c0c3-a0eb-43aa-8030-06353130a807",
+              "name": "budget:",
+              "value": "Budget ₹12 lakh.",
+              "type": "string"
+            },
+            {
+              "id": "5b769772-c258-4a2a-afda-da5cfe4f4c9e",
+              "name": "timeline:",
+              "value": "2 years",
+              "type": "string"
+            },
+            {
+              "id": "c1f8c2b0-a133-4a41-aa64-963b15890f44",
+              "name": "requirement:",
+              "value": "Need AI Automation.  Budget ₹12 lakh.  Need deployment in Dubai.  Need support for 2 years.  Can we schedule a call tomorrow?",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        256,
+        0
+      ],
+      "id": "f39c5072-697f-492b-b5cb-3e3b0d1a60ff",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=You are a Senior Sales Qualification Specialist.\n\nAnalyze the following lead.\n\nLead Details:\n\n{{ JSON.stringify($json, null, 2) }}\n\nEvaluate:\n\n1. Budget\n2. Timeline\n3. Requirement clarity\n4. Buying intent\n\nChoose only one recomended action.\n\nCALL IMMEDIATELY\n\nSCHEDULE MEETING\n\nSEND PROPOSAL\n\nFOLLOW UP\n\nREQUEST MORE INFO\n\nReturn ONLY valid JSON.\n\n{\n  \"lead_score\": 0,\n  \"lead_quality\": \"\",\n  \"reason\": \"\",\n  \"recommended_action\": \"\"\n}",
+        "hasOutputParser": true,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        464,
+        0
+      ],
+      "id": "403a4d50-b834-4a58-b74a-fba6f23fbfe9",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list",
+          "cachedResultName": "gpt-4o-mini"
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        288,
+        208
+      ],
+      "id": "94d4858b-c76f-4138-849c-38cebf03e2ad",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "63JHN9u8uhhDSAcx",
+          "name": "OpenAI account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "schemaType": "manual",
+        "inputSchema": "{\n  \"lead_score\": 0,\n  \"lead_quality\": \"\",\n  \"reason\": \"\",\n  \"recommended_action\": \"\"\n}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        608,
+        240
+      ],
+      "id": "98d07598-7874-4ec0-8a60-3de553cf1d3d",
+      "name": "Structured Output Parser"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "8849f24c-947d-45dc-837f-d95b81e2ce52",
+              "leftValue": "={{ $json.output.lead_score }}",
+              "rightValue": 80,
+              "operator": {
+                "type": "number",
+                "operation": "gte"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        768,
+        0
+      ],
+      "id": "27ac5b78-12d9-40df-aa17-f5c4f807f4c7",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1buCNT7H-0h4sIgidLsQg0yN9Bi_il_OL4NGF5H6nm4E",
+          "mode": "list",
+          "cachedResultName": "AI Lead for CRM Automation",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1buCNT7H-0h4sIgidLsQg0yN9Bi_il_OL4NGF5H6nm4E/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1buCNT7H-0h4sIgidLsQg0yN9Bi_il_OL4NGF5H6nm4E/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Name": "={{ $('Edit Fields').item.json['name:'] }}",
+            "Company": "={{ $('Edit Fields').item.json['company:'] }}",
+            "Email": "={{ $('Edit Fields').item.json['email:'] }}",
+            "Budget": "={{ $('Edit Fields').item.json['budget:'] }}",
+            "Timeline": "={{ $('Edit Fields').item.json['timeline:'] }}",
+            "Requirement": "={{ $('Edit Fields').item.json['requirement:'] }}",
+            "Lead Score": "={{ $('AI Agent').item.json.output.lead_score }}",
+            "Lead Quality": "={{ $('AI Agent').item.json.output.lead_quality }}",
+            "Reason": "={{ $('AI Agent').item.json.output.reason }}",
+            "Recommended Action": "={{ $('AI Agent').item.json.output.recommended_action }}",
+            "Date": "={{ $today }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Date",
+              "displayName": "Date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Name",
+              "displayName": "Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Company",
+              "displayName": "Company",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Email",
+              "displayName": "Email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Budget",
+              "displayName": "Budget",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Timeline",
+              "displayName": "Timeline",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Requirement",
+              "displayName": "Requirement",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Lead Score",
+              "displayName": "Lead Score",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Lead Quality",
+              "displayName": "Lead Quality",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Reason",
+              "displayName": "Reason",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Recommended Action",
+              "displayName": "Recommended Action",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1024,
+        -16
+      ],
+      "id": "b0a6cc97-53e8-4a73-a250-dda46859a36c",
+      "name": "Append row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "Jyfp3FGZMg8wAD3e",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        32,
+        0
+      ],
+      "id": "d01f92f2-c90e-4037-af72-58a00b435795",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "chatId": "1239935064",
+        "text": "=🔥 New Hot Lead Received\n\n👤 Name:{{ $json.Name }}\n\n🏢 Company:{{ $json.Company }}\n\n💰 Budget:{{ $json.Budget }}\n\n⭐ Lead Score:{{ $('AI Agent').item.json.output.lead_score }}/100\n\n📝 Requirement:{{ $json.Requirement }}\n\n📅 Timeline:{{ $json.Timeline }}\n\n📌 Recommended Action:{{ $json['Recommended Action'] }}\n\nGenerated by AI Lead Qualification System",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1280,
+        -16
+      ],
+      "id": "00c82feb-8da6-44a1-a7f7-41da9c629367",
+      "name": "Send a text message",
+      "webhookId": "ebd6d999-92d4-4407-b5b9-8a1273bc0f49",
+      "credentials": {
+        "telegramApi": {
+          "id": "svR1CV7IfKrg6pyR",
+          "name": "Telegram account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Append row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        []
+      ]
+    },
+    "Append row in sheet": {
+      "main": [
+        [
+          {
+            "node": "Send a text message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "583947b9-6269-4716-84ef-cf76aed8ec4a",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "8bf29fe464bb8cd02a1ac56721c6ca3d51cb4ba18d6562b71ce2f156ceee241f"
+  },
+  "nodeGroups": [],
+  "id": "lgG2Gl4GX8b6DW0p",
+  "tags": []
+}
