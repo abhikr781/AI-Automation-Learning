@@ -1,0 +1,203 @@
+{
+  "name": "Day 17 – AI Appointment Booking Agent",
+  "nodes": [
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.4,
+      "position": [
+        0,
+        0
+      ],
+      "id": "f72f541b-dd79-4e9e-b193-1887c20563f2",
+      "name": "When chat message received",
+      "webhookId": "58cc4890-5905-42fe-84eb-16db8c773d2a"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.chatInput }}",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "=You are an Appointment Booking Assistant.\n\nYour primary task is to carefully parse the user's message, extract all required contact details (especially the email address), and calculate precise start and end times in format (YYYY-MM-DDHH:mm:ss).\n\nAlso exclude the date and time seperately in below format:\n(YYYY-MM-DD)\n(HH:mm:ss)\n\nCurrent Context:\nToday's date and time is: {{ $now.format('YYYY-MM-DDTHH:mm:ss') }}\n\nReturn date and time as separate fields.\n\nExample:\n\nmeeting_date: 2026-07-30\n\nmeeting_time: 4:00 PM\n\nEXTRACTION RULES:\n1. EMAIL EXTRACTION:\n   - Search the user's message for any email string (e.g. rahul@gmail.com).\n2. NAME EXTRACTION:\n   - Extract the user's name if mentioned (e.g. Rahul Sharma).\n3. DATE & TIME CONVERSION:\n   - Calculate relative dates (\"tomorrow\", \"next Monday\") relative to today's date provided above.\n\nReturn JSON only.\n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        208,
+        0
+      ],
+      "id": "d826bda2-7c37-473d-9f8d-759382c49525",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list",
+          "cachedResultName": "gpt-4o-mini"
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        80,
+        208
+      ],
+      "id": "b55c4285-48c7-479a-8b6f-365569bcf6ce",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "63JHN9u8uhhDSAcx",
+          "name": "OpenAI account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "schemaType": "manual",
+        "inputSchema": "={\n  \"type\": \"object\",\n  \"properties\": {\n    \"name\": { \n      \"type\": \"string\", \n      \"description\": \"Full name of the client found in message\" \n    },\n    \"email\": { \n      \"type\": \"string\", \n      \"description\": \"Valid email address extracted directly from the user's input (e.g. name@domain.com)\" \n    },\n    \"meeting_topic\": { \n      \"type\": \"string\", \n      \"description\": \"Topic, purpose, or reason for the meeting\" \n    },\n    \"start_time\": { \n      \"type\": \"string\", \n      \"description\": \"Start date and time in ISO format (YYYY-MM-DDTHH:mm:ss)\" \n    },\n    \"end_time\": { \n      \"type\": \"string\", \n      \"description\": \"End date and time in ISO format (YYYY-MM-DDTHH:mm:ss) calculated based on duration (default 60 mins)\" \n    },\n    \"meeting_date\": { \n      \"type\": \"string\", \n      \"description\": \"Extract the meeting date in the format (YYYY-MM-DD)\" \n    },\n    \"meeting_time\": { \n      \"type\": \"string\", \n      \"description\": \"Meeting start time in format (hh:mm tt)\" \n    }\n  },\n  \"required\": [\"name\", \"email\", \"meeting_topic\",\"start_time\", \"end_time\", \"meeting_date\", \"meeting_time\"]\n}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        352,
+        224
+      ],
+      "id": "182767c2-3d00-41a7-b917-6ac883296a9f",
+      "name": "Structured Output Parser"
+    },
+    {
+      "parameters": {
+        "chatId": "1239935064",
+        "text": "=✅ Your meeting has been booked successfully.\n\nDate: {{ $('AI Agent').item.json.output.meeting_date }}\n\n\nTime: {{ DateTime.fromFormat($('AI Agent').item.json.output.meeting_time, 'HH:mm:ss').toFormat('h:mm a') }}\n\nTopic: AI Automation Discussion\n\nSee you soon!",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        768,
+        0
+      ],
+      "id": "52960970-8888-440b-bb3f-6ee45e2fbc01",
+      "name": "Send a text message",
+      "webhookId": "983cbf54-93e3-4922-9e75-03449d9c7cbd",
+      "credentials": {
+        "telegramApi": {
+          "id": "svR1CV7IfKrg6pyR",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "calendar": {
+          "__rl": true,
+          "value": "abhikr781@gmail.com",
+          "mode": "list",
+          "cachedResultName": "abhikr781@gmail.com"
+        },
+        "start": "={{ $json.output.start_time }}",
+        "end": "={{ $json.output.end_time }}",
+        "additionalFields": {
+          "summary": "={{ $json.output.meeting_topic }}"
+        }
+      },
+      "type": "n8n-nodes-base.googleCalendar",
+      "typeVersion": 1.3,
+      "position": [
+        560,
+        0
+      ],
+      "id": "004972bb-d45c-4e75-a475-87fd489d966b",
+      "name": "Create an event",
+      "credentials": {
+        "googleCalendarOAuth2Api": {
+          "id": "jdG4P5Whsny1fHFx",
+          "name": "Google Calendar account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Create an event",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create an event": {
+      "main": [
+        [
+          {
+            "node": "Send a text message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false,
+    "timeSavedMode": "fixed",
+    "timezone": "Asia/Kolkata",
+    "callerPolicy": "workflowsFromSameOwner"
+  },
+  "versionId": "080ff3c0-12c8-4228-8e74-5367bd5e358e",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "8bf29fe464bb8cd02a1ac56721c6ca3d51cb4ba18d6562b71ce2f156ceee241f"
+  },
+  "nodeGroups": [],
+  "id": "6IEJVk8ltOSG9Tnu",
+  "tags": []
+}
