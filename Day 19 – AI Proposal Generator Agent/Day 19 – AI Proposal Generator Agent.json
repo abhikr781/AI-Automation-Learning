@@ -1,0 +1,339 @@
+{
+  "name": "Day 19 – AI Proposal Generator Agent",
+  "nodes": [
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.4,
+      "position": [
+        -336,
+        -112
+      ],
+      "id": "13eb98da-fa27-4e84-8a4b-426c158c6079",
+      "name": "When chat message received",
+      "webhookId": "b3c204c7-79ae-4ce0-a93a-19a18c257bb4"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.chatInput }}",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "=You are a Senior AI Solution Consultant at a top-tier Web & AI Automation Agency in India.\n\nAnalyze the user's requirement carefully and strictly follow these guidelines:\n\n1. CUSTOMER & COMPANY NAME EXTRACTION:\n   - Extract 'customer_name' directly from the input text if available (e.g., \"Jack\"). If missing, strictly set as \"Valued Client\".\n   - Extract 'company_name' if mentioned. If NOT explicitly provided in the input, strictly return \"N/A\".\n   - NEVER invent or fabricate fictitious names like \"Tech Solutions Inc.\" or \"ACME Corp\".\n\n2. BUDGET ESTIMATION RULES (INR ONLY):\n   - ALWAYS express budget strictly in Indian Rupees (INR / ₹). Never convert to or output in USD ($).\n   - If the client explicitly provides a budget (e.g., ₹2,50,000), RESPECT and use that exact budget.\n   - Evaluate scope vs budget: If the budget is too low for the whole scope, structure \"scope_of_work\" and \"phased_roadmap\" into Phase 1 (MVP fitting budget) and Phase 2 (Future Add-ons).\n   - If NO budget is mentioned, provide a realistic industry-standard estimated price range in INR.\n\n3. TIMELINE RULES:\n   - If the client specifies an expected timeline/delivery (e.g., \"within 4 weeks\"), USE THAT EXACT TIMELINE in 'estimated_timeline'.\n   - Do NOT inflate or alter the timeline unless technically impossible.\n\n4. FORMATTING RULES:\n   - Make 'proposal_title' strictly in UPPERCASE (e.g., \"AI AUTOMATION DEVELOPMENT PROPOSAL\").\n   - Format 'recommended_solutions', 'deliverables', and 'next_steps' as clean text with bullet points (e.g., • Item 1\\n• Item 2) so they display neatly in Google Docs.\n   - Tone must be executive, clear, persuasive, and value-focused.\n   - Output strictly valid JSON matching the schema provided."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        -96,
+        -112
+      ],
+      "id": "0e57805d-0dab-4fbb-8104-1957aa8e5d86",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "schemaType": "manual",
+        "inputSchema": "={\n  \"$schema\": \"http://json-schema.org/draft-07/schema#\",\n  \"type\": \"object\",\n  \"properties\": {\n    \"customer_name\": {\n      \"type\": \"string\",\n      \"description\": \"Explicit customer name from input message. Return 'Valued Client' if missing.\"\n    },\n    \"company_name\": {\n      \"type\": \"string\",\n      \"description\": \"Explicit company name from input message. Return 'Not Provided' if missing.\"\n    },\n    \"project_type\": { \n      \"type\": \"string\",\n      \"description\": \"Short category e.g., AI Website Chatbot\"\n    },\n    \"estimated_budget\": { \n      \"type\": \"string\",\n      \"description\": \"Budget strictly in INR (e.g., ₹2,50,000). Use user's budget if provided.\"\n    },\n    \"estimated_timeline\": { \n      \"type\": \"string\",\n      \"description\": \"Timeline strictly matching user's request (e.g., 4 Weeks).\"\n    },\n    \"proposal_title\": { \n      \"type\": \"string\",\n      \"description\": \"Title strictly in UPPERCASE.\"\n    },\n    \"proposal_summary\": { \n      \"type\": \"string\",\n      \"description\": \"Executive summary of the proposal.\"\n    },\n    \"recommended_solutions\": { \n      \"type\": \"string\",\n      \"description\": \"Bullet-pointed list of solutions (e.g., • Feature 1\\\\n• Feature 2).\"\n    },\n    \"deliverables\": { \n      \"type\": \"string\",\n      \"description\": \"Bullet-pointed list of deliverables with checkmarks (e.g., ✔ Deliverable 1\\\\n✔ Deliverable 2).\"\n    },\n    \"phased_roadmap\": { \n      \"type\": \"string\",\n      \"description\": \"Phased implementation plan if budget mismatch exists.\"\n    },\n    \"next_steps\": { \n      \"type\": \"string\",\n      \"description\": \"Bullet-pointed next steps (e.g., • Step 1\\\\n• Step 2).\"\n    }\n  },\n  \"required\": [\n    \"customer_name\",\n    \"company_name\",\n    \"project_type\",\n    \"estimated_budget\",\n    \"estimated_timeline\",\n    \"proposal_title\",\n    \"proposal_summary\",\n    \"recommended_solutions\",\n    \"deliverables\",\n    \"phased_roadmap\",\n    \"next_steps\"\n  ]\n}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        48,
+        96
+      ],
+      "id": "2067e4d1-146d-427c-8570-496b4e5deed5",
+      "name": "Structured Output Parser"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list",
+          "cachedResultName": "gpt-4o-mini"
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        -208,
+        144
+      ],
+      "id": "f3eb707e-c566-41fd-a22c-fe194dd5f281",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "63JHN9u8uhhDSAcx",
+          "name": "OpenAI account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentURL": "={{ $json.id }}",
+        "actionsUi": {
+          "actionFields": [
+            {
+              "action": "replaceAll",
+              "text": "=proposal_title",
+              "replaceText": "={{ $('AI Agent').item.json.output.proposal_title.toUpperCase() }}"
+            },
+            {
+              "action": "replaceAll",
+              "text": "customer_name",
+              "replaceText": "={{ $('AI Agent').item.json.output.customer_name }}"
+            },
+            {
+              "action": "replaceAll",
+              "text": "proposal_summary",
+              "replaceText": "={{ $('AI Agent').item.json.output.proposal_summary }}"
+            },
+            {
+              "action": "replaceAll",
+              "text": "recommended_solutions",
+              "replaceText": "={{ $('AI Agent').item.json.output.recommended_solutions }}"
+            },
+            {
+              "action": "replaceAll",
+              "text": "estimated_timeline",
+              "replaceText": "={{ $('AI Agent').item.json.output.estimated_timeline }}"
+            },
+            {
+              "action": "replaceAll",
+              "text": "estimated_budget",
+              "replaceText": "={{ $('AI Agent').item.json.output.estimated_budget }}"
+            },
+            {
+              "action": "replaceAll",
+              "text": "phased_roadmap",
+              "replaceText": "={{ $('AI Agent').item.json.output.phased_roadmap }}"
+            },
+            {
+              "action": "replaceAll",
+              "text": "next_steps",
+              "replaceText": "={{ $('AI Agent').item.json.output.next_steps }}"
+            },
+            {
+              "action": "replaceAll",
+              "text": "company_name",
+              "replaceText": "={{ $('AI Agent').item.json.output.company_name }}"
+            },
+            {
+              "action": "replaceAll",
+              "text": "today_date",
+              "replaceText": "={{ $today.format('DD') }}"
+            },
+            {
+              "action": "replaceAll",
+              "text": "deliverables ",
+              "replaceText": "={{ $('AI Agent').item.json.output.deliverables }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.googleDocs",
+      "typeVersion": 2,
+      "position": [
+        464,
+        -112
+      ],
+      "id": "1e1f41b9-81ef-43c5-9368-5be4586892ce",
+      "name": "Update a document",
+      "credentials": {
+        "googleDocsOAuth2Api": {
+          "id": "WeVH5hD98bN6ggpT",
+          "name": "Google Docs account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "copy",
+        "fileId": {
+          "__rl": true,
+          "value": "1mBFVfAMeqR7PEztbTBqsYOwF9wh2qPcoUxEX3SblSfQ",
+          "mode": "list",
+          "cachedResultName": "Master_Proposal_Template",
+          "cachedResultUrl": "https://docs.google.com/document/d/1mBFVfAMeqR7PEztbTBqsYOwF9wh2qPcoUxEX3SblSfQ/edit?usp=drivesdk"
+        },
+        "name": "=Proposal- {{ $json.output.project_type }}- {{ $today.format('yyyy-MM-DD') }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        240,
+        -112
+      ],
+      "id": "d780ffc2-9cbf-49ec-8be5-b39dbbc57a2e",
+      "name": "Copy file",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "OuEe23F98VwDaO0R",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "download",
+        "fileId": {
+          "__rl": true,
+          "value": "={{ $json.documentId }}",
+          "mode": "id"
+        },
+        "options": {
+          "googleFileConversion": {
+            "conversion": {
+              "docsToFormat": "application/pdf",
+              "drawingsToFormat": "application/pdf"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        672,
+        -112
+      ],
+      "id": "494a8cc0-e701-493a-9284-92d98e116e98",
+      "name": "Download file",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "OuEe23F98VwDaO0R",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "abhikr781@gmail.com",
+        "subject": "={{ $('AI Agent').item.json.output.proposal_title }}",
+        "message": "=\n<div style=\"font-family: 'Segoe UI', Arial, sans-serif; font-size: 15px; color: #333333; line-height: 1.6; max-width: 600px; margin: 0 auto; border: 1px solid #e0e0e0; border-radius: 8px; padding: 25px; background-color: #ffffff;\">\n\n  <p style=\"margin-top: 0;\">Hi <strong>{{ $('AI Agent').item.json.output.customer_name }}</strong>,</p>\n\n  <p>Thank you for reaching out and sharing your project requirements with us.</p>\n\n  <p>Based on our analysis, we have prepared a comprehensive project proposal tailored specifically for your business goals.</p>\n\n  <!-- Key Highlights Box -->\n  <div style=\"background-color: #f8fafc; border-left: 4px solid #2563eb; padding: 15px; margin: 20px 0; border-radius: 4px;\">\n    <h4 style=\"margin: 0 0 10px 0; color: #1e293b; font-size: 16px;\">📌 Executive Overview:</h4>\n    <ul style=\"margin: 0; padding-left: 20px; color: #475569;\">\n      <li style=\"margin-bottom: 5px;\"><strong>Project Type:</strong> {{ $('AI Agent').item.json.output.project_type }}</li>\n      <li style=\"margin-bottom: 5px;\"><strong>Estimated Timeline:</strong> {{ $('AI Agent').item.json.output.estimated_timeline }}</li>\n      <li><strong>Estimated Investment:</strong> {{ $('AI Agent').item.json.output.estimated_budget }}</li>\n    </ul>\n  </div>\n\n  <p>The detailed technical proposal, complete scope of work, deliverables, and phased roadmap are attached to this email as a PDF document for your review.</p>\n\n  <!-- Call To Action -->\n  <p>Please review the attached proposal. If everything aligns with your expectations, let us know a suitable time for a quick 10-minute kickoff call to discuss the next steps.</p>\n\n  <br>\n\n  <!-- Sign off -->\n  <div style=\"border-top: 1px solid #e2e8f0; padding-top: 15px; font-size: 14px; color: #64748b;\">\n    <p style=\"margin: 0; font-weight: bold; color: #0f172a;\">Best Regards,</p>\n    <p style=\"margin: 3px 0 0 0;\"><strong>Solutions Engineering Team</strong></p>\n    <p style=\"margin: 3px 0 0 0;\"><em>Your Agency Name</em></p>\n  </div>\n\n</div>",
+        "options": {
+          "attachmentsUi": {
+            "attachmentsBinary": [
+              {}
+            ]
+          }
+        }
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        896,
+        -112
+      ],
+      "id": "bbae0282-a3f8-4817-bd4c-5ee50d18be1c",
+      "name": "Send a message",
+      "webhookId": "5347f0ea-d589-4db1-944b-662fabfbda88",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "XYe3V63WVqSRCG5n",
+          "name": "Gmail account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Copy file",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update a document": {
+      "main": [
+        [
+          {
+            "node": "Download file",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Copy file": {
+      "main": [
+        [
+          {
+            "node": "Update a document",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download file": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "e3d28c8f-2242-49de-b862-0513a25a8d61",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "8bf29fe464bb8cd02a1ac56721c6ca3d51cb4ba18d6562b71ce2f156ceee241f"
+  },
+  "nodeGroups": [],
+  "id": "UkpiWEWOccD9BkF6",
+  "tags": []
+}
