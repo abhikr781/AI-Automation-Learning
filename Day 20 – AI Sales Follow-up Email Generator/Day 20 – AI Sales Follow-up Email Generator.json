@@ -1,0 +1,300 @@
+{
+  "name": "Day 20 – AI Sales Follow-up Email Generator",
+  "nodes": [
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.4,
+      "position": [
+        0,
+        0
+      ],
+      "id": "3f6618be-c200-4a56-83f9-8bd033857054",
+      "name": "When chat message received",
+      "webhookId": "4b043227-46ba-471e-b2d4-7208c13ed65b"
+    },
+    {
+      "parameters": {
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "=You are an expert B2B Senior Sales Executive specializing in AI & Tech Solutions. Your goal is to write a highly tailored, non-pushy, and effective follow-up email based on the incoming lead data in the user message.\n\n### INPUT DATA EVALUATION:\nAnalyze the incoming user message to extract and evaluate:\n- Client Name\n- Company / Requirement\n- Last Contact\n- Lead Status / Notes\n\n### INTENT HIERARCHY & IDENTIFICATION (STRICT):\nIdentify the Primary and Secondary intents using this priority hierarchy:\n1. Scheduling Meeting / Meeting Confirmation (HIGHEST PRIORITY: If client accepts, proposes, or confirms a meeting time or call)\n2. Ready to Proceed / Contract Discussion (If pricing/deal is accepted)\n3. Technical / Implementation Clarification (If questions about features, stack, or integrations are asked)\n4. Budget / Pricing Inquiry (If client asks for rates/quotations for the FIRST time)\n5. No Response / Re-engagement (If lead is silent > 15 days)\n\n### STRATEGY MATRIX:\n1. Primary Intent: \"Scheduling Meeting / Meeting Confirmation\"\n   -> Strategy: Confirm timing politely (\"works well on our end\"), state next steps (\"I'll send a calendar invitation shortly\"), and align discussion agenda.\n2. Primary Intent: \"Budget Approval Pending / Soft Check-in\"\n   -> Strategy: Patient check-in, offer relevant implementation examples or technical breakdowns during the call.\n3. Primary Intent: \"Ready to Proceed\"\n   -> Strategy: High priority, confident, direct call to action (CTA), outline final kickoff steps.\n4. Primary Intent: \"No Response (Silent > 15 days)\"\n   -> Strategy: Gentle re-engagement, acknowledge busy schedule, offer low-friction timing.\n\n### 🚫 CRITICAL BOUNDARIES & GUARDRAILS (STRICT PRODUCTION RULES):\n\n1. NO UNFULFILLED REAL-TIME CLAIMS:\n   - NEVER claim an action has already happened (e.g., DO NOT say \"I've scheduled our meeting\").\n   - ALWAYS state intent safely (e.g., \"Tuesday at 4 PM works well from our side. I'll send a calendar invitation shortly\").\n\n2. NO TECHNICAL FEASIBILITY GUARANTEES:\n   - NEVER guarantee technical compatibility or third-party integrations (e.g., Teams, SAP, custom APIs) unless explicitly confirmed in the system setup data.\n   - ALWAYS state feasibility conversationally: \"[Feature/Integration] is certainly something we can evaluate based on your existing setup. I'd be happy to discuss the implementation approach during our meeting.\"\n\n3. CONTEXT-AWARE PROPOSAL TERMINOLOGY:\n   - If a proposal has ALREADY been sent or discussed, NEVER say \"I will prepare a custom proposal\".\n   - INSTEAD USE: \"I can share a detailed implementation plan\", \"technical breakdown\", or \"architecture blueprint\".\n\n4. STRICT PRICING POLICY:\n   - NEVER guess or commit to specific pricing/discounts without explicit pricing data in the input.\n\n5. CLIENT MIRRORING & EMPATHY RULE:\n   - Always mirror the client's exact phrases/words when referencing their constraints or key events (e.g., use \"annual conference\" directly instead of generic \"upcoming event\").\n   - Explicitly validate the importance of their target: \"We understand how important it is to have everything ready before your annual conference, and we'll work with you to plan the implementation accordingly.\"\n\n6. CLEAR & FRICTIONLESS CLOSING CTA:\n   - Do NOT end with a passive generic sign-off like \"Looking forward to our discussion.\"\n   - ALWAYS end with a soft, action-oriented condition/CTA that makes it effortless for the client to reply.\n   - Example: \"If Friday afternoon still works for you, I'll share the calendar invite shortly. Looking forward to speaking with you.\"\n\n### GENERAL RULES:\n- Personalization: Mention at least one specific technical or business detail from the client's message.\n- Tone: Professional, empathetic, solution-oriented, and non-pushy.\n- Include lead details provided in the input into the JSON response.\n- Output: Adhere strictly to the JSON Schema provided by the output parser."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        208,
+        0
+      ],
+      "id": "f2e93690-46af-4f37-893e-131793ad086e",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list",
+          "cachedResultName": "gpt-4o-mini"
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        80,
+        208
+      ],
+      "id": "504cb97f-a573-4f45-aee8-0379792c6ee2",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "63JHN9u8uhhDSAcx",
+          "name": "OpenAI account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "schemaType": "manual",
+        "inputSchema": "={\n  \"type\": \"object\",\n  \"properties\": {\n    \"lead_id\": {\n      \"type\": \"string\",\n      \"description\": \"Generate or pass Lead ID, format e.g. L-0001\"\n    },\n    \"client_name\": {\n      \"type\": \"string\",\n      \"description\": \"Client's name extracted from input\"\n    },\n    \"email\": {\n      \"type\": \"string\",\n      \"description\": \"Client's email address extracted from input\"\n    },\n    \"subject\": {\n      \"type\": \"string\",\n      \"description\": \"Email subject line\"\n    },\n    \"email_body\": {\n      \"type\": \"string\",\n      \"description\": \"Full follow-up email body\"\n    },\n    \"followup_type\": {\n      \"type\": \"string\",\n      \"description\": \"Type of follow-up (e.g. Scheduling Meeting / Meeting Confirmation)\"\n    },\n    \"intent\": {\n      \"type\": \"string\",\n      \"description\": \"Primary client intent\"\n    },\n    \"priority\": {\n      \"type\": \"string\",\n      \"enum\": [\"High\", \"Medium\", \"Low\"]\n    },\n    \"email_status\": {\n      \"type\": \"string\",\n      \"description\": \"Set default as 'Sent' or 'Pending'\"\n    },\n    \"followup_count\": {\n      \"type\": \"integer\",\n      \"description\": \"Increment follow-up count (e.g. 1)\"\n    },\n    \"next_action\": {\n      \"type\": \"string\",\n      \"description\": \"Recommended next action\"\n    }\n  },\n  \"required\": [\n    \"lead_id\",\n    \"client_name\",\n    \"email\",\n    \"subject\",\n    \"email_body\",\n    \"followup_type\",\n    \"intent\",\n    \"priority\",\n    \"email_status\",\n    \"followup_count\",\n    \"next_action\"\n  ]\n}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        384,
+        208
+      ],
+      "id": "76ea9184-a1da-4386-861d-f61b8232562c",
+      "name": "Structured Output Parser"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1HmeBG_oS-wKhV1K9AciGcSME825ZIQUOpD0_j96uaAU",
+          "mode": "list",
+          "cachedResultName": "Day-20-email-log",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1HmeBG_oS-wKhV1K9AciGcSME825ZIQUOpD0_j96uaAU/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1HmeBG_oS-wKhV1K9AciGcSME825ZIQUOpD0_j96uaAU/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Next Action": "={{ $json.output.next_action }}",
+            "Client Name": "={{ $json.output.client_name }}",
+            "Email": "={{ $json.output.email }}",
+            "Follow-up Type": "={{ $json.output.followup_type }}",
+            "Intent": "={{ $json.output.intent }}",
+            "Priority": "={{ $json.output.priority }}",
+            "Subject": "={{ $json.output.subject }}",
+            "Email Status": "={{ $json.output.email_status }}",
+            "Follow-up Count": "={{ $json.output.followup_count }}",
+            "Last Activity": "={{ $now.format('yyyy-MM-dd HH:mm:ss') }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Lead-ID",
+              "displayName": "Lead-ID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Client Name",
+              "displayName": "Client Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Email",
+              "displayName": "Email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Follow-up Type",
+              "displayName": "Follow-up Type",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Intent",
+              "displayName": "Intent",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Priority",
+              "displayName": "Priority",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Subject",
+              "displayName": "Subject",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Email Status",
+              "displayName": "Email Status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Follow-up Count",
+              "displayName": "Follow-up Count",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Last Activity",
+              "displayName": "Last Activity",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Next Action",
+              "displayName": "Next Action",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        560,
+        0
+      ],
+      "id": "ea3182a3-96b2-40b1-800a-4d23035d9bf2",
+      "name": "Append row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "Jyfp3FGZMg8wAD3e",
+          "name": "Google Sheets account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Append row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "cab254ac-68bf-48ed-b57f-070c3dea926c",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "8bf29fe464bb8cd02a1ac56721c6ca3d51cb4ba18d6562b71ce2f156ceee241f"
+  },
+  "nodeGroups": [],
+  "id": "OMFWvhn85PHvZaSl",
+  "tags": []
+}
