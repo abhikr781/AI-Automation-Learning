@@ -1,0 +1,273 @@
+{
+  "name": "Day 21 – AI Blog Generator + SEO Pipeline",
+  "nodes": [
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.4,
+      "position": [
+        0,
+        0
+      ],
+      "id": "4dcb9605-cead-47e5-ba1f-bfc2ecbd5bc2",
+      "name": "When chat message received",
+      "webhookId": "809112a6-a03a-4a38-a2b4-1b7d9d5104ac"
+    },
+    {
+      "parameters": {
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "=You are an Elite SEO Content Writer and B2B Marketing Strategist. Your goal is to write high-converting, deeply educational, human-like marketing blogs based on user input.\n\nBUSINESS & SEO RULES (STRICT COMPLIANCE REQUIRED):\n1. SEO Title: Max 60 characters. Must contain high-intent power words and current year (2026).\n2. Meta Description: Max 155 characters. Action-oriented with high CTR appeal.\n3. Slug: Lowercase only, hyphenated (e.g., ai-automation-small-business). No special characters.\n4. Category: Assign a high-level relevant category (e.g., \"Digital Marketing\", \"AI Automation\", \"B2B Strategy\").\n5. Tags: Generate MINIMUM 8 hyper-relevant, long-tail SEO tags separated by commas.\n6. Estimated Reading Time: Calculate based on word count (e.g., \"8 min read\").\n7. Excerpt: A sharp 2-sentence summary suitable for blog preview cards.\n8. Featured Image Prompt: Detailed prompt (for Midjourney/DALL-E) visualizing the concept in a modern tech/corporate aesthetic.\n9. Content Structure & Depth:\n   - Hook/Introduction: Start directly with a high-impact pain point, problem, or industry reality.\n   - Headings: Use # for main title, ## for H2, and ### for H3 inside blog_content.\n   - Depth Per Section: Each major section must include:\n     * What/Why: The core concept explained clearly.\n     * Scenario/Example: A practical, concrete business application.\n     * Business Benefit: Operational impact.\n10. UNSUPPORTED STATISTICS GUARDRAIL (CRITICAL):\n    - DO NOT generate fake, exact source stats (e.g., \"Study proves 47.3% boost\").\n    - Present metrics as illustrative ranges (e.g., \"Companies adopting this often see up to 30-40% reduction in manual effort...\").\n\n### 🎯 STRICT FOCUS KEYWORD RULES (NEVER LEAVE BLANK):\n1. Focus Keyword MUST NEVER BE BLANK under any circumstance.\n2. If no explicit focus keyword is provided, extract/derive the primary high-volume keyword directly from the title/topic (e.g., \"Digital Marketing Trends 2026\").\n3. Ensure Focus Keyword appears naturally in SEO Title, Meta Description, URL Slug, and First 100 words of blog_content.\n\n### 🚫 STRICT TEMPLATE & NO-BLANK POLICY:\n1. NEVER leave any JSON field empty, null, or missing.\n2. DO NOT write \"## FAQs\", \"## Key Takeaways\", or \"## Internal Links\" inside the \"blog_content\" field.\n3. Keep \"blog_content\" strictly for the main article body and conclusion.\n4. FAQs, Key Takeaways, Internal Links, and CTA MUST be provided in their respective standalone JSON keys.\n\n### 🚨 MANDATORY EXECUTION RULE:\n- ALL 15 fields defined in the parser schema MUST be generated with complete, non-empty text.\n- Do NOT skip category, estimated_reading_time, url_slug, blog_excerpt, featured_image_prompt, or internal_links under any circumstance.\n\n### 📐 MANDATORY OUTPUT JSON SCHEMA:\nRespond ONLY with a valid JSON object strictly matching this structure (DO NOT WRAP IN MARKDOWN OR CODE BLOCKS):\n\n{\n  \"blog_title\": \"Full Blog Title Here\",\n  \"seo_title\": \"SEO Title (Max 60 chars)\",\n  \"meta_description\": \"Meta description (Max 155 chars)\",\n  \"focus_keyword\": \"Target SEO Keyword\",\n  \"url_slug\": \"hyphenated-url-slug\",\n  \"category\": \"Category Name\",\n  \"estimated_reading_time\": \"X min read\",\n  \"tags\": \"tag1, tag2, tag3, tag4, tag5, tag6, tag7, tag8\",\n  \"blog_excerpt\": \"Sharp 2-sentence summary for preview cards.\",\n  \"featured_image_prompt\": \"Detailed AI image generation prompt for DALL-E/Midjourney.\",\n  \"key_takeaways\": [\n    \"Actionable lesson 1\",\n    \"Actionable lesson 2\",\n    \"Actionable lesson 3\",\n    \"Actionable lesson 4\"\n  ],\n  \"blog_content\": \"Full markdown blog content here with #, ##, ### headers without FAQs or Takeaways.\",\n  \"faqs\": [\n    {\n      \"question\": \"Frequently asked question 1?\",\n      \"answer\": \"Concise authoritative answer 1.\"\n    },\n    {\n      \"question\": \"Frequently asked question 2?\",\n      \"answer\": \"Concise authoritative answer 2.\"\n    },\n    {\n      \"question\": \"Frequently asked question 3?\",\n      \"answer\": \"Concise authoritative answer 3.\"\n    }\n  ],\n  \"internal_links\": [\n    \"Related Reading: [Title 1]\",\n    \"Related Reading: [Title 2]\",\n    \"Related Reading: [Title 3]\"\n  ],\n  \"call_to_action\": \"Compelling 2-3 sentence conversion pitch.\"\n}"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        208,
+        0
+      ],
+      "id": "f1926609-5c84-4d28-8c8a-dcdb7636e9b0",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "schemaType": "manual",
+        "inputSchema": "{\n  \"type\": \"object\",\n  \"properties\": {\n    \"blog_title\": { \"type\": \"string\" },\n    \"seo_title\": { \"type\": \"string\" },\n    \"meta_description\": { \"type\": \"string\" },\n    \"focus_keyword\": { \"type\": \"string\" },\n    \"url_slug\": { \"type\": \"string\" },\n    \"category\": { \"type\": \"string\" },\n    \"estimated_reading_time\": { \"type\": \"string\" },\n    \"tags\": { \"type\": \"string\" },\n    \"blog_excerpt\": { \"type\": \"string\" },\n    \"featured_image_prompt\": { \"type\": \"string\" },\n    \"key_takeaways\": {\n      \"type\": \"array\",\n      \"items\": { \"type\": \"string\" }\n    },\n    \"blog_content\": { \"type\": \"string\" },\n    \"faqs\": {\n      \"type\": \"array\",\n      \"items\": {\n        \"type\": \"object\",\n        \"properties\": {\n          \"question\": { \"type\": \"string\" },\n          \"answer\": { \"type\": \"string\" }\n        }\n      }\n    },\n    \"internal_links\": {\n      \"type\": \"array\",\n      \"items\": { \"type\": \"string\" }\n    },\n    \"call_to_action\": { \"type\": \"string\" }\n  },\n  \"required\": [\n    \"blog_title\",\n    \"seo_title\",\n    \"meta_description\",\n    \"focus_keyword\",\n    \"url_slug\",\n    \"category\",\n    \"estimated_reading_time\",\n    \"tags\",\n    \"blog_excerpt\",\n    \"featured_image_prompt\",\n    \"key_takeaways\",\n    \"blog_content\",\n    \"faqs\",\n    \"internal_links\",\n    \"call_to_action\"\n  ]\n}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        384,
+        208
+      ],
+      "id": "c50a9f3d-dfe2-45d1-8911-2331c3adacfc",
+      "name": "Structured Output Parser"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4o",
+          "mode": "list",
+          "cachedResultName": "gpt-4o"
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        64,
+        208
+      ],
+      "id": "442b785f-abd4-406e-932c-47cdd3977dfb",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "63JHN9u8uhhDSAcx",
+          "name": "OpenAI account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "copy",
+        "fileId": {
+          "__rl": true,
+          "value": "1SvwmN6xXlQOvOpn-lhoQoDoe28i8v2YOZrCF8Y4L_U4",
+          "mode": "list",
+          "cachedResultName": "Day 21 – AI Blog Generator Master Template",
+          "cachedResultUrl": "https://docs.google.com/document/d/1SvwmN6xXlQOvOpn-lhoQoDoe28i8v2YOZrCF8Y4L_U4/edit?usp=drivesdk"
+        },
+        "name": "={{ $json.output.blog_title }}| Draft",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        560,
+        0
+      ],
+      "id": "d5db8086-d2c2-4981-bbd5-75f0a1209499",
+      "name": "Copy file",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "OuEe23F98VwDaO0R",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentURL": "={{ $json.id }}",
+        "actionsUi": {
+          "actionFields": [
+            {
+              "action": "replaceAll",
+              "text": "=blog_title",
+              "replaceText": "={{ $('AI Agent').item.json.output.blog_title }}"
+            },
+            {
+              "action": "replaceAll",
+              "text": "seo_title",
+              "replaceText": "={{ $('AI Agent').item.json.output.seo_title }}"
+            },
+            {
+              "action": "replaceAll",
+              "text": "meta_description",
+              "replaceText": "={{ $('AI Agent').item.json.output.meta_description }}"
+            },
+            {
+              "action": "replaceAll",
+              "text": "focus_keyword",
+              "replaceText": "={{ $('AI Agent').item.json.output.focus_keyword }}"
+            },
+            {
+              "action": "replaceAll",
+              "text": "url_slug",
+              "replaceText": "={{ $('AI Agent').item.json.output.url_slug }}"
+            },
+            {
+              "action": "replaceAll",
+              "text": "blog_category",
+              "replaceText": "={{ $('AI Agent').item.json.output.category }}"
+            },
+            {
+              "action": "replaceAll",
+              "text": "blog_tags",
+              "replaceText": "={{ $('AI Agent').item.json.output.tags }}"
+            },
+            {
+              "action": "replaceAll",
+              "text": "blog_content",
+              "replaceText": "={{ $('AI Agent').item.json.output.blog_content }}"
+            },
+            {
+              "action": "replaceAll",
+              "text": "call_to_action",
+              "replaceText": "={{ $('AI Agent').item.json.output.call_to_action }}"
+            },
+            {
+              "action": "replaceAll",
+              "text": "estimated_reading_time",
+              "replaceText": "={{ $('AI Agent').item.json.output.estimated_reading_time }}"
+            },
+            {
+              "action": "replaceAll",
+              "text": "blog_excerpt",
+              "replaceText": "={{ $('AI Agent').item.json.output.blog_excerpt }}"
+            },
+            {
+              "action": "replaceAll",
+              "text": "featured_image_prompt ",
+              "replaceText": "={{ $('AI Agent').item.json.output.featured_image_prompt }}"
+            },
+            {
+              "action": "replaceAll",
+              "text": "key_takeaways",
+              "replaceText": "={{ $('AI Agent').item.json.output.key_takeaways.map(t => '• ' + t).join('\\n') }}"
+            },
+            {
+              "action": "replaceAll",
+              "text": "blog_faqs",
+              "replaceText": "={{ $('AI Agent').item.json.output.faqs.map(f => 'Q: ' + f.question + '\\nA: ' + f.answer).join('\\n\\n')  }}"
+            },
+            {
+              "action": "replaceAll",
+              "text": "internal_links",
+              "replaceText": "={{ $('AI Agent').item.json.output.internal_links.map(l => '→ ' + l).join('\\n')  }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.googleDocs",
+      "typeVersion": 2,
+      "position": [
+        768,
+        0
+      ],
+      "id": "c7371389-2d0f-493c-9d3d-2c2f0389bc38",
+      "name": "Update a document",
+      "credentials": {
+        "googleDocsOAuth2Api": {
+          "id": "WeVH5hD98bN6ggpT",
+          "name": "Google Docs account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Copy file",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Copy file": {
+      "main": [
+        [
+          {
+            "node": "Update a document",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "483d5345-4b0c-4bff-b8ce-0d69f3175e56",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "8bf29fe464bb8cd02a1ac56721c6ca3d51cb4ba18d6562b71ce2f156ceee241f"
+  },
+  "nodeGroups": [],
+  "id": "zEsRv6lKgsyxBtSi",
+  "tags": []
+}
