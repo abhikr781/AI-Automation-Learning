@@ -1,0 +1,404 @@
+{
+  "name": "Day 23 – AI Invoice & Billing Automation",
+  "nodes": [
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.4,
+      "position": [
+        -368,
+        -128
+      ],
+      "id": "44a818df-297a-460e-80ca-70fca33a505e",
+      "name": "When chat message received",
+      "webhookId": "fe8c7101-1226-4b48-908d-545da95281e0"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list",
+          "cachedResultName": "gpt-4o-mini"
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        32,
+        48
+      ],
+      "id": "4ded107d-f513-404e-ac61-ee2e82cfe263",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "63JHN9u8uhhDSAcx",
+          "name": "OpenAI account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "schemaType": "manual",
+        "inputSchema": "={\n  \"type\": \"object\",\n  \"properties\": {\n    \"invoice_number\": { \"type\": \"string\" },\n    \"invoice_date\": { \"type\": \"string\" },\n    \"due_date\": { \"type\": \"string\" },\n    \"invoice_status\": { \"type\": \"string\" },\n    \"payment_status\": { \"type\": \"string\" },\n    \"payment_methods\": { \"type\": \"string\" },\n    \"client_name\": { \"type\": \"string\" },\n    \"client_email\": { \"type\": \"string\" },\n    \"items\": {\n      \"type\": \"array\",\n      \"items\": {\n        \"type\": \"object\",\n        \"properties\": {\n          \"description\": { \"type\": \"string\" },\n          \"quantity\": { \"type\": \"number\" },\n          \"unit_price\": { \"type\": \"string\" },\n          \"total\": { \"type\": \"string\" }\n        },\n        \"required\": [\"description\", \"quantity\", \"unit_price\", \"total\"]\n      }\n    },\n    \"subtotal\": { \"type\": \"string\" },\n    \"gst_percentage\": { \"type\": \"string\" },\n    \"gst_amount\": { \"type\": \"string\" },\n    \"grand_total\": { \"type\": \"string\" },\n    \"payment_terms\": { \"type\": \"string\" },\n    \"notes\": { \"type\": \"string\" },\n    \"thank_you_message\": { \"type\": \"string\" },\n    \"is_valid\": { \"type\": \"boolean\" },\n    \"error_flag\": { \"type\": \"string\" }\n  },\n  \"required\": [\n    \"invoice_number\", \"invoice_date\", \"due_date\", \"client_name\", \n    \"items\", \"subtotal\", \"grand_total\", \"is_valid\"\n  ]\n}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        208,
+        64
+      ],
+      "id": "1a999948-994b-45d2-b7eb-ae2a5a883cd8",
+      "name": "Structured Output Parser"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=You are an Enterprise AI Billing Specialist and Senior Accountant.\n\nYour task is to analyze the user's unstructured chat input, extract all single or multi-item billing details, calculate exact financial values, validate data integrity, and return a structured JSON object.\n\nCURRENT DATE: {{ $today.format('YYYY-MM-DD') }}\nINVOICE NUMBER TO USE: {{ $json.invoice_number }}\n\nUSER CHAT INPUT:\n{{ $json.chatInput }}\n\n--------------------------------------------------\nBUSINESS LOGIC & EXTRACTION RULES:\n\n1. INVOICE METADATA & STATUSES:\n   - Invoice Number: Strictly use the provided \"INVOICE NUMBER TO USE\" above. DO NOT generate your own number.\n   - Invoice Date: Set to Today's Date ({{ $today.format('YYYY-MM-DD') }}).\n   - Due Date: Extract if explicitly mentioned in input. If missing, calculate exactly 15 days from Today's Date.\n   - Invoice Status: Set to \"Ready to Send\" (Default).\n   - Payment Status: Extract from chat if mentioned (e.g., \"Paid\", \"Advance Paid\"). Otherwise, default to \"Pending\".\n   - Payment Methods: Default to \"Bank Transfer (NEFT/RTGS), UPI, Credit Card\" unless custom methods are specified.\n\n2. MULTI-ITEM EXTRACTION & FINANCIAL CALCULATIONS:\n   - Extract ALL services/items mentioned in the chat input into an array named \"items\".\n   - For each item:\n     * description: Name/Details of the service or product.\n     * quantity: Integer value (Default to 1 if unspecified).\n     * unit_price: Price per unit formatted in INR (e.g., ₹75,000.00).\n     * total: (quantity * numeric_unit_price) formatted in INR (e.g., ₹75,000.00).\n   - Subtotal: Sum of all item totals formatted in INR (e.g., ₹1,20,000.00).\n   - GST %: Extract percentage if mentioned (e.g., 18%, 0%). Default to \"18%\" if unspecified, or \"0%\" if explicitly stated as non-taxable/0%.\n   - GST Amount: (Subtotal * GST %) formatted in INR (e.g., ₹21,600.00).\n   - Grand Total: (Subtotal + GST Amount) formatted in INR (e.g., ₹1,41,600.00).\n\n3. VALIDATION CHECK:\n   - Calculate numeric Grand Total.\n   - IF Subtotal or Grand Total is 0, negative, or uncomputable, set \"is_valid\": false and \"error_flag\": \"Invalid amount: Total invoice amount must be greater than zero.\"\n   - OTHERWISE, set \"is_valid\": true and \"error_flag\": \"\".\n\n4. BUSINESS TEXTS & REMARKS:\n   - Payment Terms: Extract terms if specified (e.g., \"50% Advance\", \"100% After Delivery\"). Otherwise, default to \"Payment due within 15 days of invoice issue date.\"\n   - Notes: Standard accounting note (e.g., \"Please quote the invoice number in your bank transfer reference.\").\n   - Thank You Message: Formal and professional appreciation message (e.g., \"Thank you for your business. We appreciate your partnership and look forward to continuing our collaboration.\").\n\n5. STRICT FALLBACK RULE:\n   - If any optional string field (e.g., client_email, notes, due_date) is missing or not provided in the input, strictly return \"Not Provided\". Never output null, empty strings (\"\"), or undefined.\n\n6. Output valid JSON adhering strictly to the provided Structured Output Schema.",
+        "hasOutputParser": true,
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.9,
+      "position": [
+        64,
+        -128
+      ],
+      "id": "82428f6b-3ca6-4357-a23d-b99b121dabc0",
+      "name": "Basic LLM Chain"
+    },
+    {
+      "parameters": {
+        "operation": "copy",
+        "fileId": {
+          "__rl": true,
+          "value": "1FuFTN7lQz3Q0380eRUdzJsrBhpq9XYlw1CeXFYpuiT0",
+          "mode": "list",
+          "cachedResultName": "Day-23–AI-Invoice&Billing-Automation-Master-Template",
+          "cachedResultUrl": "https://docs.google.com/document/d/1FuFTN7lQz3Q0380eRUdzJsrBhpq9XYlw1CeXFYpuiT0/edit?usp=drivesdk"
+        },
+        "name": "={{ $json.safeOutput.company_name }}-{{ $json.safeOutput.invoice_number }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        624,
+        -128
+      ],
+      "id": "b9a07c39-749d-48f0-8cdf-9f536d9d2a61",
+      "name": "Copy file",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "OuEe23F98VwDaO0R",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Get n8n workflow static data storage\nconst staticData = $getWorkflowStaticData('global');\n\n// Get current date string (YYYYMMDD)\nconst now = new Date();\nconst year = now.getFullYear();\nconst month = String(now.getMonth() + 1).padStart(2, '0');\nconst day = String(now.getDate()).padStart(2, '0');\nconst dateStr = `${year}${month}${day}`;\n\n// 1. Check if date changed -> Reset counter to 1 for a new day\nif (staticData.lastDate !== dateStr) {\n  staticData.lastDate = dateStr;\n  staticData.invoiceCounter = 1;\n}\n\n// 2. Fetch current counter value\nlet currentCounter = staticData.invoiceCounter || 1;\n\n// 3. Format counter to 3 digits (e.g., 001, 002)\nconst formattedCounter = String(currentCounter).padStart(3, '0');\nconst invoiceNumber = `INV-${dateStr}-${formattedCounter}`;\n\n// 4. Increment counter for the NEXT execution\nstaticData.invoiceCounter = currentCounter + 1;\n\n// Return both invoice number and user chat input\nreturn {\n  invoice_number: invoiceNumber,\n  chatInput: $('When chat message received').item.json.chatInput\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -160,
+        -128
+      ],
+      "id": "afe8f0fd-442d-4314-add5-58cbaf7d7f9d",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentURL": "={{ $json.id }}",
+        "actionsUi": {
+          "actionFields": [
+            {
+              "action": "replaceAll",
+              "text": "invoice_number",
+              "replaceText": "={{ $('Code in JavaScript').item.json.invoice_number }}"
+            },
+            {
+              "action": "replaceAll",
+              "text": "invoice_date",
+              "replaceText": "={{ $('Basic LLM Chain').item.json.output.invoice_date }}"
+            },
+            {
+              "action": "replaceAll",
+              "text": "due_date",
+              "replaceText": "={{ $('Basic LLM Chain').item.json.output.due_date }}"
+            },
+            {
+              "action": "replaceAll",
+              "text": "client_name",
+              "replaceText": "={{ $('Basic LLM Chain').item.json.output.client_name }}"
+            },
+            {
+              "action": "replaceAll",
+              "text": "client_email",
+              "replaceText": "={{ $('Basic LLM Chain').item.json.output.client_email }}"
+            },
+            {
+              "action": "replaceAll",
+              "text": "i_subtotal",
+              "replaceText": "={{ $('Basic LLM Chain').item.json.output.subtotal }}"
+            },
+            {
+              "action": "replaceAll",
+              "text": "gst_percentage",
+              "replaceText": "={{ $('Basic LLM Chain').item.json.output.gst_percentage }}"
+            },
+            {
+              "action": "replaceAll",
+              "text": "gst_amount",
+              "replaceText": "={{ $('Basic LLM Chain').item.json.output.gst_amount }}"
+            },
+            {
+              "action": "replaceAll",
+              "text": "grand_total",
+              "replaceText": "={{ $('Basic LLM Chain').item.json.output.grand_total }}"
+            },
+            {
+              "action": "replaceAll",
+              "text": "payment_terms",
+              "replaceText": "={{ $('Basic LLM Chain').item.json.output.payment_terms }}"
+            },
+            {
+              "action": "replaceAll",
+              "text": "i_notes",
+              "replaceText": "={{ $('Basic LLM Chain').item.json.output.notes }}"
+            },
+            {
+              "action": "replaceAll",
+              "text": "thank_you_message",
+              "replaceText": "={{ $('Basic LLM Chain').item.json.output.thank_you_message }}"
+            },
+            {
+              "action": "replaceAll",
+              "text": " i_quantity",
+              "replaceText": "={{String($('Basic LLM Chain').item.json.output.quantity) }}"
+            },
+            {
+              "action": "replaceAll",
+              "text": "company_name ",
+              "replaceText": "={{ $('Code in JavaScript1').item.json.safeOutput.company_name }}"
+            },
+            {
+              "action": "replaceAll",
+              "text": "company_email",
+              "replaceText": "={{ $('Code in JavaScript1').item.json.safeOutput.company_email }}"
+            },
+            {
+              "action": "replaceAll",
+              "text": "company_phone",
+              "replaceText": "={{ $('Code in JavaScript1').item.json.safeOutput.company_phone }}"
+            },
+            {
+              "action": "replaceAll",
+              "text": "company_gstin",
+              "replaceText": "={{ $('Code in JavaScript1').item.json.safeOutput.company_gstin }}"
+            },
+            {
+              "action": "replaceAll",
+              "text": "company_website",
+              "replaceText": "={{ $('Code in JavaScript1').item.json.safeOutput.company_website }}"
+            },
+            {
+              "action": "replaceAll",
+              "text": "invoice_status",
+              "replaceText": "={{ $('Code in JavaScript1').item.json.safeOutput.invoice_status }}"
+            },
+            {
+              "action": "replaceAll",
+              "text": "payment_status",
+              "replaceText": "={{ $('Code in JavaScript1').item.json.safeOutput.payment_status }}"
+            },
+            {
+              "action": "replaceAll",
+              "text": "line_items_table",
+              "replaceText": "={{ $('Code in JavaScript1').item.json.safeOutput.line_items_table }}"
+            },
+            {
+              "action": "replaceAll",
+              "text": "payment_methods",
+              "replaceText": "={{ $('Code in JavaScript1').item.json.safeOutput.payment_methods }}"
+            },
+            {
+              "action": "replaceAll",
+              "text": " payment_terms",
+              "replaceText": "={{ $('Code in JavaScript1').item.json.safeOutput.payment_terms }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.googleDocs",
+      "typeVersion": 2,
+      "position": [
+        848,
+        -128
+      ],
+      "id": "a3a72488-cddf-44c1-a2a2-f4d801833b9b",
+      "name": "Update a document",
+      "credentials": {
+        "googleDocsOAuth2Api": {
+          "id": "WeVH5hD98bN6ggpT",
+          "name": "Google Docs account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "let inputData = $input.first().json;\nlet rawData = inputData.output || inputData;\nlet safeOutput = {};\n\n// Static Company Info\nsafeOutput.company_name = \"AI Automation Solutions\";\nsafeOutput.company_email = \"billing@aiautomation.io\";\nsafeOutput.company_phone = \"+91 98765 43210\";\nsafeOutput.company_gstin = \"07AAAAA0000A1Z5\";\nsafeOutput.company_website = \"www.aiautomation.io\";\n\n// Format Line Items Array into text table\nlet items = rawData.items || [];\nlet tableRows = [];\ntableRows.push(\"Description\".padEnd(35) + \"Qty\".padEnd(8) + \"Price\".padEnd(15) + \"Total\");\ntableRows.push(\"-\".repeat(70));\n\nif (Array.isArray(items) && items.length > 0) {\n  items.forEach(item => {\n    let desc = String(item.description || \"Service\").padEnd(35);\n    let qty = String(item.quantity || 1).padEnd(8);\n    let price = String(item.unit_price || \"₹0.00\").padEnd(15);\n    let total = String(item.total || \"₹0.00\");\n    tableRows.push(`${desc}${qty}${price}${total}`);\n  });\n}\nsafeOutput.line_items_table = tableRows.join(\"\\n\");\n\n// Enforce string conversion for all other parameters\nfor (let key in rawData) {\n  if (key !== 'items') {\n    safeOutput[key] = (rawData[key] === null || rawData[key] === undefined || rawData[key] === \"\") \n      ? \"N/A\" \n      : String(rawData[key]);\n  }\n}\n\nreturn { safeOutput };"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        416,
+        -128
+      ],
+      "id": "a935fbc0-49f1-412b-8fc8-f6b6278205bb",
+      "name": "Code in JavaScript1"
+    },
+    {
+      "parameters": {
+        "operation": "download",
+        "fileId": {
+          "__rl": true,
+          "value": "={{ $json.documentId }}",
+          "mode": "id"
+        },
+        "options": {
+          "googleFileConversion": {
+            "conversion": {
+              "docsToFormat": "application/pdf"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        1056,
+        -128
+      ],
+      "id": "c6c18636-7438-4905-b9a4-1a88cc0b9b83",
+      "name": "Download file",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "OuEe23F98VwDaO0R",
+          "name": "Google Drive account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Basic LLM Chain": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Copy file": {
+      "main": [
+        [
+          {
+            "node": "Update a document",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript1": {
+      "main": [
+        [
+          {
+            "node": "Copy file",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update a document": {
+      "main": [
+        [
+          {
+            "node": "Download file",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "082f8f4b-7c9d-4ae6-88c4-cf5c6f3117fa",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "8bf29fe464bb8cd02a1ac56721c6ca3d51cb4ba18d6562b71ce2f156ceee241f"
+  },
+  "nodeGroups": [],
+  "id": "zP7ptMkjGPM975Mf",
+  "tags": []
+}
