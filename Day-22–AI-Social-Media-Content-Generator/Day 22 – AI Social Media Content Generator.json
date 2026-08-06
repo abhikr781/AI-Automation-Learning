@@ -1,0 +1,259 @@
+{
+  "name": "Day 22 – AI Social Media Content Generator",
+  "nodes": [
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.4,
+      "position": [
+        0,
+        0
+      ],
+      "id": "34233018-b3c3-44a8-b1d0-214f60b4adc5",
+      "name": "When chat message received",
+      "webhookId": "e90647e9-a5e9-4519-acb7-3498c3b7daeb"
+    },
+    {
+      "parameters": {
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "=You are an elite Social Media Growth Strategist and Copywriter who creates platform-native, high-converting content packages for global brands.\n\n### CRITICAL CORE DIRECTIVES\n\n1. ZERO TRADEMARK / LOGO POLICY IN IMAGE PROMPTS:\n   - NEVER use brand logos, company names, or trademarked app icons (e.g., Notion, Slack, Apple, Trello logos).\n   - Instead, describe generic, functional UI components (e.g., \"a sleek productivity dashboard on a tablet screen, colorful organizational widgets, sticky notes, clean minimalist study desk\").\n\n2. PLATFORM-SPECIFIC HASHTAG QUANTITY MATRIX:\n   - LinkedIn: Strictly 3 to 5 hashtags (#AIOptimization, NO SPACES).\n   - Instagram: Strictly 7 to 10 hashtags (#StudentLife, #StudyTips).\n   - Facebook: Strictly 2 to 4 hashtags.\n   - X (Twitter): Strictly 2 to 4 hashtags.\n   - RULE: Never put spaces inside any hashtag string.\n\n3. DYNAMIC POSTING TIME WINDOWS:\n   - Provide recommended engagement windows based on platform-specific audience behavior (e.g., Facebook: \"Weekdays 9:00 AM – 11:00 AM or 1:00 PM – 3:00 PM local time\").\n\n4. ZERO-TOLERANCE GRAMMAR & TYPO CHECK:\n   - Double-check all spelling, syntax, and punctuation before producing the output. Zero typos permitted.\n\n---\n\n### PLATFORM WRITING FORMULAS\n\n- LINKEDIN:\n  * Style: Professional Storytelling / Thought Leadership.\n  * Caption: Deep narrative structure, bullet checkmarks (✔), space out paragraphs for high readability.\n  * CTA: High-value discussion-focused question.\n\n- INSTAGRAM:\n  * Style: Visual-First / Relatable / Conversational.\n  * Caption: Emojis integrated naturally, student/youth friendly if target audience, listicle format.\n\n- FACEBOOK:\n  * Style: Community-Focused / Discussion Driver.\n  * Caption: Warm, relatable tone. Ask personal experience questions to boost comment section discourse.\n\n- X (TWITTER):\n  * Style: Ultra-Concise / Punchy / Viral.\n  * Caption: Single-line sentences, whitespace between lines, thread-ready format.\n\n---\n\n### CINEMATIC IMAGE PROMPT GENERATOR (FLUX / MIDJOURNEY READY)\n- Combine the subject with 'visual_style'.\n- Always append production quality boosters: \"ultra-realistic\", \"cinematic lighting\", \"depth of field\", \"editorial photography\", \"clean composition\", \"8k resolution\", \"highly detailed\".\n\n---\n\nCRITICAL: Respond ONLY with a valid JSON object matching the requested schema. \nDo NOT wrap the JSON in ```json markdown formatting. Do NOT add any introductory or concluding text."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        208,
+        0
+      ],
+      "id": "db1eaddf-2ca2-4d84-b44a-bcbc60d09a0b",
+      "name": "AI Social Media Generator"
+    },
+    {
+      "parameters": {
+        "schemaType": "manual",
+        "inputSchema": "={\n  \"type\": \"object\",\n  \"properties\": {\n    \"topic\": { \"type\": \"string\" },\n    \"platform\": { \"type\": \"string\" },\n    \"content_style\": { \"type\": \"string\" },\n    \"content_goal\": { \"type\": \"string\" },\n    \"content_angle\": { \"type\": \"string\" },\n    \"visual_style\": { \"type\": \"string\" },\n    \"hook\": { \"type\": \"string\" },\n    \"caption\": { \"type\": \"string\" },\n    \"hashtags\": { \"type\": \"array\", \"items\": { \"type\": \"string\" } },\n    \"image_prompt\": { \"type\": \"string\" },\n    \"call_to_action\": { \"type\": \"string\" },\n    \"best_posting_time\": { \"type\": \"string\" },\n    \"engagement_tip\": { \"type\": \"string\" }\n  },\n  \"required\": [\n    \"topic\",\n    \"platform\",\n    \"content_style\",\n    \"content_goal\",\n    \"content_angle\",\n    \"visual_style\",\n    \"hook\",\n    \"caption\",\n    \"hashtags\",\n    \"image_prompt\",\n    \"call_to_action\",\n    \"best_posting_time\",\n    \"engagement_tip\"\n  ]\n}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        384,
+        208
+      ],
+      "id": "6bca62d1-dd48-4e3c-8689-f9c4e4ad383e",
+      "name": "Structured Output Parser"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list",
+          "cachedResultName": "gpt-4o-mini"
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        64,
+        208
+      ],
+      "id": "330c5a6c-d3c5-4b01-af91-992cc56a5823",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "63JHN9u8uhhDSAcx",
+          "name": "OpenAI account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "copy",
+        "fileId": {
+          "__rl": true,
+          "value": "10rJWXeu8pt-Bg9PxKDdXz9sStIgvbu3Qyc10cim8Rjw",
+          "mode": "list",
+          "cachedResultName": "Day 22 – AI Social Media Content Generator - Master Template ",
+          "cachedResultUrl": "https://docs.google.com/document/d/10rJWXeu8pt-Bg9PxKDdXz9sStIgvbu3Qyc10cim8Rjw/edit?usp=drivesdk"
+        },
+        "name": "=Content - {{ $json.output.topic }} - {{ $today.format('YYYY-MM-DD') }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        560,
+        0
+      ],
+      "id": "06ba05fa-c782-40e1-88ad-7ef420b8dd72",
+      "name": "Copy file",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "OuEe23F98VwDaO0R",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentURL": "={{ $json.id }}",
+        "actionsUi": {
+          "actionFields": [
+            {
+              "action": "replaceAll",
+              "text": "output_platform",
+              "replaceText": "={{ $('AI Social Media Generator').item.json.output.platform }}"
+            },
+            {
+              "action": "replaceAll",
+              "text": "output_hook",
+              "replaceText": "={{ $('AI Social Media Generator').item.json.output.hook }}"
+            },
+            {
+              "action": "replaceAll",
+              "text": "output_caption",
+              "replaceText": "={{ $('AI Social Media Generator').item.json.output.caption }}"
+            },
+            {
+              "action": "replaceAll",
+              "text": "output_hashtags",
+              "replaceText": "={{ $('AI Social Media Generator').item.json.output.hashtags.join(' ') }}"
+            },
+            {
+              "action": "replaceAll",
+              "text": "image_prompt",
+              "replaceText": "={{ $('AI Social Media Generator').item.json.output.image_prompt }}"
+            },
+            {
+              "action": "replaceAll",
+              "text": "best_posting_time",
+              "replaceText": "={{ $('AI Social Media Generator').item.json.output.best_posting_time }}"
+            },
+            {
+              "action": "replaceAll",
+              "text": "engagement_tip",
+              "replaceText": "={{ $('AI Social Media Generator').item.json.output.engagement_tip }}"
+            },
+            {
+              "action": "replaceAll",
+              "text": "call_to_action",
+              "replaceText": "={{ $('AI Social Media Generator').item.json.output.call_to_action }}"
+            },
+            {
+              "action": "replaceAll",
+              "text": "content_style ",
+              "replaceText": "={{ $('AI Social Media Generator').item.json.output.content_style }}"
+            },
+            {
+              "action": "replaceAll",
+              "text": "content_goal",
+              "replaceText": "={{ $('AI Social Media Generator').item.json.output.content_goal }}"
+            },
+            {
+              "action": "replaceAll",
+              "text": "content_angle ",
+              "replaceText": "={{ $('AI Social Media Generator').item.json.output.content_angle }}"
+            },
+            {
+              "action": "replaceAll",
+              "text": "visual_style",
+              "replaceText": "={{ $('AI Social Media Generator').item.json.output.visual_style }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.googleDocs",
+      "typeVersion": 2,
+      "position": [
+        752,
+        0
+      ],
+      "id": "b736feb6-17a5-43f7-9782-584589385df8",
+      "name": "Update a document",
+      "credentials": {
+        "googleDocsOAuth2Api": {
+          "id": "WeVH5hD98bN6ggpT",
+          "name": "Google Docs account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "AI Social Media Generator",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "AI Social Media Generator",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Social Media Generator",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Social Media Generator": {
+      "main": [
+        [
+          {
+            "node": "Copy file",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Copy file": {
+      "main": [
+        [
+          {
+            "node": "Update a document",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "3668d62e-a3da-4fb9-b0c7-7cd2a5abe32c",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "8bf29fe464bb8cd02a1ac56721c6ca3d51cb4ba18d6562b71ce2f156ceee241f"
+  },
+  "nodeGroups": [],
+  "id": "ftzeZHshNNnPrKgS",
+  "tags": []
+}
