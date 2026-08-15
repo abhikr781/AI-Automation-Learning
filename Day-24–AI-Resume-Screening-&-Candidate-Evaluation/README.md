@@ -1,3 +1,6 @@
+Bilkul bhai. **Same content ko ek single copy-paste block mein** de raha hoon. Isko direct `README.md` mein paste kar sakte ho.
+
+````markdown
 # Day 24 – AI Resume Screening & Candidate Evaluation Agent
 
 ## Overview
@@ -28,9 +31,9 @@ Resume Analyzer Agent
 Code in JavaScript
         ↓
 Append row in sheet
-```
+````
 
-### AI JD Analyzer sub-nodes
+### AI JD Analyzer Sub-nodes
 
 ```text
 AI JD Analyzer
@@ -38,7 +41,7 @@ AI JD Analyzer
 └── Structured JD Requirements (Output Parser)
 ```
 
-### Resume Analyzer Agent sub-nodes
+### Resume Analyzer Agent Sub-nodes
 
 ```text
 Resume Analyzer Agent
@@ -52,8 +55,8 @@ Resume Analyzer Agent
 
 The workflow accepts:
 
-- Job Description
-- Resume file (PDF)
+* Job Description
+* Resume file (PDF)
 
 The PDF is processed through the **Extract from File** node.
 
@@ -69,13 +72,13 @@ The JD Analyzer extracts structured hiring requirements from the job description
 
 Current extracted fields include:
 
-- `role`
-- `minimum_experience_years`
-- `required_skills`
-- `preferred_skills`
-- `critical_skills`
-- `education_requirements`
-- `certification_requirements`
+* `role`
+* `minimum_experience_years`
+* `required_skills`
+* `preferred_skills`
+* `critical_skills`
+* `education_requirements`
+* `certification_requirements`
 
 ### Requirement Categories
 
@@ -85,13 +88,13 @@ Skills explicitly required by the JD.
 
 Examples:
 
-- Python
-- FastAPI
-- SQL
-- REST APIs
-- Docker
-- AWS
-- Git
+* Python
+* FastAPI
+* SQL
+* REST APIs
+* Docker
+* AWS
+* Git
 
 #### Preferred Skills
 
@@ -113,30 +116,30 @@ The Resume Analyzer extracts factual information from the resume and compares th
 
 The analyzer is instructed not to invent:
 
-- experience
-- skills
-- projects
-- education
-- certifications
-- email
-- phone
-- proficiency
+* experience
+* skills
+* projects
+* education
+* certifications
+* email
+* phone
+* proficiency
 
 It also does not perform the final score/risk/hiring decision.
 
-### Candidate information extracted
+### Candidate Information Extracted
 
 The workflow can extract:
 
-- Candidate name
-- Email
-- Phone
-- Relevant experience
-- Education
-- Certifications
-- Python proficiency
-- Primary background
-- Alternative role fit
+* Candidate name
+* Email
+* Phone
+* Relevant experience
+* Education
+* Certifications
+* Python proficiency
+* Primary background
+* Alternative role fit
 
 ---
 
@@ -146,7 +149,7 @@ The Resume Analyzer creates a `skill_audit` entry for each required and preferre
 
 Each entry contains:
 
-```json
+```text
 {
   "skill": "Python",
   "status": "MATCHED",
@@ -154,11 +157,11 @@ Each entry contains:
 }
 ```
 
-### Supported statuses
+### Supported Statuses
 
-- `MATCHED`
-- `PARTIAL`
-- `MISSING`
+* `MATCHED`
+* `PARTIAL`
+* `MISSING`
 
 ### MATCHED
 
@@ -176,11 +179,11 @@ The workflow does not infer one technology from another.
 
 Examples:
 
-- Node.js does not mean Python
-- Express does not mean FastAPI
-- Docker does not mean Kubernetes
-- AWS does not mean Azure
-- PostgreSQL does not automatically mean SQL without supporting database/SQL evidence
+* Node.js does not mean Python
+* Express does not mean FastAPI
+* Docker does not mean Kubernetes
+* AWS does not mean Azure
+* PostgreSQL does not automatically mean SQL without supporting database/SQL evidence
 
 ---
 
@@ -188,21 +191,21 @@ Examples:
 
 The final score is calculated in the JavaScript Code node rather than relying on the AI model to calculate it.
 
-Current scoring weights:
+### Current Scoring Weights
 
-| Metric | Weight |
-|---|---:|
-| Required Skills | 50 |
-| Experience | 25 |
-| Critical Skills | 15 |
-| Preferred Skills | 10 |
-| **Total** | **100** |
+| Metric           |  Weight |
+| ---------------- | ------: |
+| Required Skills  |      50 |
+| Experience       |      25 |
+| Critical Skills  |      15 |
+| Preferred Skills |      10 |
+| **Total**        | **100** |
 
 ### Required Skill Score
 
-- MATCHED = 1 point
-- PARTIAL = 0.5 point
-- MISSING = 0 points
+* MATCHED = 1 point
+* PARTIAL = 0.5 point
+* MISSING = 0 points
 
 The resulting score is normalized against the total required skills and weighted to 50 points.
 
@@ -214,17 +217,17 @@ The score is capped at the maximum experience weight.
 
 ### Critical Skill Score
 
-- MATCHED = 1 point
-- PARTIAL = 0.5 point
-- MISSING = 0 points
+* MATCHED = 1 point
+* PARTIAL = 0.5 point
+* MISSING = 0 points
 
 The result is weighted to 15 points.
 
 ### Preferred Skill Score
 
-- MATCHED = 1 point
-- PARTIAL = 0.5 point
-- MISSING = 0 points
+* MATCHED = 1 point
+* PARTIAL = 0.5 point
+* MISSING = 0 points
 
 The result is weighted to 10 points.
 
@@ -237,25 +240,27 @@ If no preferred skills are specified, the preferred bucket receives its full wei
 The workflow currently uses the following decision thresholds:
 
 | Overall Score | Recommendation |
-|---:|---|
-| 85+ | Strong Hire |
-| 70–84 | Interview |
-| 55–69 | Hold |
-| Below 55 | Reject |
+| ------------: | -------------- |
+|           85+ | Strong Hire    |
+|         70–84 | Interview      |
+|         55–69 | Hold           |
+|      Below 55 | Reject         |
 
 Critical skill gaps have additional impact.
 
 Current logic:
 
-- 2 or more critical skills missing → Reject / High Risk
-- 1 critical skill missing:
-  - score >= 65 → Interview / Medium Risk
-  - score < 65 → Reject / High Risk
-- No critical gaps:
-  - 85+ → Strong Hire / Low Risk
-  - 70–84 → Interview / Medium Risk
-  - 55–69 → Hold / Medium Risk
-  - below 55 → Reject / High Risk
+* 2 or more critical skills missing → Reject / High Risk
+* 1 critical skill missing:
+
+  * score >= 65 → Interview / Medium Risk
+  * score < 65 → Reject / High Risk
+* No critical gaps:
+
+  * 85+ → Strong Hire / Low Risk
+  * 70–84 → Interview / Medium Risk
+  * 55–69 → Hold / Medium Risk
+  * below 55 → Reject / High Risk
 
 ---
 
@@ -263,13 +268,13 @@ Current logic:
 
 The workflow automatically generates a concise HR-oriented summary using:
 
-- matched skills
-- partial skills
-- missing skills
-- experience vs. requirement
-- overall score
-- recommendation
-- critical skill gaps
+* matched skills
+* partial skills
+* missing skills
+* experience vs. requirement
+* overall score
+* recommendation
+* critical skill gaps
 
 Example:
 
@@ -289,12 +294,12 @@ The Resume Analyzer generates up to 5 interview questions.
 
 Questions focus on:
 
-- real project experience
-- technical depth
-- important skill gaps
-- practical implementation
-- troubleshooting
-- architecture
+* real project experience
+* technical depth
+* important skill gaps
+* practical implementation
+* troubleshooting
+* architecture
 
 The final JavaScript node formats the questions for the final output.
 
@@ -304,23 +309,23 @@ The final JavaScript node formats the questions for the final output.
 
 The current Google Sheets output contains the main candidate evaluation fields:
 
-| Field |
-|---|
-| Candidate |
-| Email |
-| Phone |
-| Experience |
-| Education |
-| Matched Skills |
-| Missing Skills |
-| Match % |
-| Overall Score |
-| Risk |
-| Recommendation |
-| HR Summary |
+| Field               |
+| ------------------- |
+| Candidate           |
+| Email               |
+| Phone               |
+| Experience          |
+| Education           |
+| Matched Skills      |
+| Missing Skills      |
+| Match %             |
+| Overall Score       |
+| Risk                |
+| Recommendation      |
+| HR Summary          |
 | Interview Questions |
-| Status |
-| Reviewed On |
+| Status              |
+| Reviewed On         |
 
 Additional internal evaluation fields are generated before the final sheet append step.
 
@@ -330,14 +335,14 @@ Additional internal evaluation fields are generated before the final sheet appen
 
 A candidate with:
 
-- 5 years of relevant experience
-- Python
-- FastAPI
-- SQL
-- REST APIs
-- Docker
-- AWS
-- missing Git
+* 5 years of relevant experience
+* Python
+* FastAPI
+* SQL
+* REST APIs
+* Docker
+* AWS
+* missing Git
 
 can receive an evaluation similar to:
 
@@ -393,16 +398,16 @@ The core resume screening workflow is operational and has been tested with multi
 
 The current implementation includes:
 
-- JD requirement extraction
-- resume evidence extraction
-- required/preferred/critical skill evaluation
-- deterministic scoring
-- experience scoring
-- risk assessment
-- hiring recommendation
-- HR summary
-- interview questions
-- Google Sheets output
+* JD requirement extraction
+* resume evidence extraction
+* required/preferred/critical skill evaluation
+* deterministic scoring
+* experience scoring
+* risk assessment
+* hiring recommendation
+* HR summary
+* interview questions
+* Google Sheets output
 
 Further polishing, edge-case testing, and future production improvements can be added separately without changing the core workflow.
 
@@ -410,13 +415,13 @@ Further polishing, edge-case testing, and future production improvements can be 
 
 ## Tech Stack
 
-- n8n
-- OpenAI Chat Model
-- n8n AI Agent
-- Structured Output Parser
-- JavaScript
-- PDF extraction
-- Google Sheets
+* n8n
+* OpenAI Chat Model
+* n8n AI Agent
+* Structured Output Parser
+* JavaScript
+* PDF extraction
+* Google Sheets
 
 ---
 
@@ -424,3 +429,5 @@ Further polishing, edge-case testing, and future production improvements can be 
 
 Build a practical AI-powered recruitment automation that can reduce manual resume screening effort while keeping the final scoring and decision logic deterministic and transparent.
 
+```
+```
