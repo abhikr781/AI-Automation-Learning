@@ -1,0 +1,505 @@
+{
+  "name": "Day 24 – AI Resume Screening & Candidate Evaluation Agent",
+  "nodes": [
+    {
+      "parameters": {
+        "options": {
+          "allowFileUploads": true,
+          "allowedFilesMimeTypes": "*Resume"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.4,
+      "position": [
+        -16,
+        -336
+      ],
+      "id": "d2c465cd-4bf1-4f00-8a0b-45c57466cb50",
+      "name": "When chat message received",
+      "webhookId": "6c63ab0b-401a-4440-b803-6df7c51d9df7"
+    },
+    {
+      "parameters": {
+        "operation": "pdf",
+        "binaryPropertyName": "data0",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1.1,
+      "position": [
+        240,
+        -336
+      ],
+      "id": "bbc12ba3-3619-4fb3-bd93-6efa3ac1de5c",
+      "name": "Extract from File"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1cz1yfkJPM9BzfsqzjikSVoIGThXY7wxQuZTtBCj7_Rg",
+          "mode": "list",
+          "cachedResultName": "Day 24 – AI Resume Screening sheet",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1cz1yfkJPM9BzfsqzjikSVoIGThXY7wxQuZTtBCj7_Rg/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1cz1yfkJPM9BzfsqzjikSVoIGThXY7wxQuZTtBCj7_Rg/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Candidate": "={{ $json.Candidate }}",
+            "Experience": "={{ $json.Experience }}",
+            "Recommendation": "={{ $json.Recommendation }}",
+            "Status": "={{ $json.Status }}",
+            "Match %": "={{ $json['Match Percentage'] }}",
+            "Email": "={{ $json.Email }}",
+            "Phone": "={{ $json.Phone }}",
+            "Education": "={{ $json.Education }}",
+            "Matched Skills": "={{ $json['Matched Skills'] }}",
+            "Missing Skills": "={{ $json['Missing Skills'] }}",
+            "Overall Score": "={{ $json['Overall Score'] }}",
+            "Risk": "={{ $json['Risk Level'] }}",
+            "Recommended Role": "=",
+            "HR Summary": "={{ $json['HR Decision Summary'] }}",
+            "Interview Questions": "={{ $json['Interview Questions'] }}",
+            "Reviewed On": "={{ $json['Reviewed On'] }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Candidate",
+              "displayName": "Candidate",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Email",
+              "displayName": "Email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Phone",
+              "displayName": "Phone",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Experience",
+              "displayName": "Experience",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Education",
+              "displayName": "Education",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Matched Skills",
+              "displayName": "Matched Skills",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Missing Skills",
+              "displayName": "Missing Skills",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Match %",
+              "displayName": "Match %",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Overall Score",
+              "displayName": "Overall Score",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Risk",
+              "displayName": "Risk",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Recommendation",
+              "displayName": "Recommendation",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Recommended Role",
+              "displayName": "Recommended Role",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "HR Summary",
+              "displayName": "HR Summary",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Interview Questions",
+              "displayName": "Interview Questions",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Reviewed On",
+              "displayName": "Reviewed On",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1328,
+        -336
+      ],
+      "id": "cbba2e61-1554-4e0b-a711-ee48eab3ef35",
+      "name": "Append row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "Jyfp3FGZMg8wAD3e",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=CRITICAL INSTRUCTION:\nReturn ONLY one valid JSON object.\nDo NOT use markdown.\nDo NOT wrap JSON inside ```json.\nStart directly with { and end with }.\n\nYou are a Job Description Requirement Extraction Engine.\n\nYour ONLY job is to extract the hiring rules explicitly stated in the Job Description.\n\nDo NOT evaluate candidates.\nDo NOT calculate scores.\nDo NOT recommend candidates.\nDo NOT invent requirements.\n\n==================================================\n1. ROLE\n==================================================\n\nExtract the exact job role/title from the JD.\n\nIf no role is explicitly stated:\n\"Not Specified\"\n\n==================================================\n2. EXPERIENCE\n==================================================\n\nExtract the minimum professional experience requirement.\n\nExamples:\n\n\"5+ years experience\"\n→ 5\n\n\"Minimum 3 years\"\n→ 3\n\n\"2-4 years\"\n→ 2\n\nIf no minimum experience is explicitly stated:\n0\n\nReturn a number only.\n\nDo not infer experience requirements from seniority titles alone.\n\n==================================================\n3. REQUIRED SKILLS\n==================================================\n\nrequired_skills must contain skills explicitly described as required for the role.\n\nLook for language such as:\n\n- required\n- must have\n- must be proficient in\n- strong experience in\n- essential\n- mandatory\n- core requirement\n\nDo not add technologies merely because they appear somewhere in the JD.\n\nNormalize obvious wording variations where appropriate.\n\nExample:\n\n\"RESTful API development\"\n→ \"REST APIs\"\n\n==================================================\n4. PREFERRED SKILLS\n==================================================\n\npreferred_skills must contain skills explicitly described as:\n\n- preferred\n- nice to have\n- bonus\n- plus\n- desirable\n- advantage\n\nPreferred skills must NOT be treated as required skills.\n\n==================================================\n5. CRITICAL SKILLS\n==================================================\n\ncritical_skills must contain only skills explicitly identified as:\n\n- mandatory\n- must-have\n- essential\n- core\n- critical\n\nIf the JD does not explicitly identify any critical skills:\n[]\n\nIMPORTANT:\n\nEvery critical skill should also appear in required_skills.\n\nNever assume a skill is critical simply because it is technically important.\n\n==================================================\n6. EDUCATION\n==================================================\n\nExtract explicitly stated education requirements.\n\nExamples:\n\n\"Bachelor's degree in Computer Science\"\n→ [\"Bachelor's degree in Computer Science\"]\n\nIf not specified:\n[]\n\n==================================================\n7. CERTIFICATIONS\n==================================================\n\nExtract explicitly required or preferred formal certifications.\n\nDo not treat courses, tutorials, bootcamps or general training as certifications.\n\nIf none:\n[]\n\n==================================================\n8. SKILL NORMALIZATION\n==================================================\n\nUse consistent names.\n\nExamples:\n\n\"RESTful APIs\" → \"REST APIs\"\n\"Amazon Web Services\" → \"AWS\"\n\"Structured Query Language\" → \"SQL\"\n\"Git version control\" → \"Git\"\n\nDo not merge different technologies.\n\nExample:\n\nNode.js ≠ Python\nExpress ≠ FastAPI\nDjango ≠ FastAPI\nPostgreSQL ≠ SQL\n\n==================================================\nOUTPUT FORMAT\n==================================================\n\n{\n  \"role\": \"Python Backend Developer\",\n  \"minimum_experience_years\": 5,\n  \"required_skills\": [\"Python\", \"FastAPI\", \"SQL\"],\n  \"preferred_skills\": [\"AWS\", \"Docker\"],\n  \"critical_skills\": [\"Python\", \"FastAPI\"],\n  \"education_requirements\": [\"Bachelor's degree in Computer Science\"],\n  \"certification_requirements\": []\n}\n\nJOB DESCRIPTION:\n\n{{ $('When chat message received').item.json.chatInput }}",
+        "hasOutputParser": true,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        464,
+        -336
+      ],
+      "id": "31e96a15-f241-470c-ab74-012a7e4489a4",
+      "name": "AI JD Analyzer"
+    },
+    {
+      "parameters": {
+        "schemaType": "manual",
+        "inputSchema": "={\n  \"role\": \"Python Backend Developer\",\n  \"minimum_experience_years\": 5,\n  \"required_skills\": [\n    \"Python\",\n    \"FastAPI\",\n    \"SQL\",\n    \"REST APIs\",\n    \"Docker\",\n    \"AWS\",\n    \"Git\"\n  ],\n  \"preferred_skills\": [\n    \"PostgreSQL\",\n    \"AWS EC2\",\n    \"AWS S3\",\n    \"Linux\",\n    \"CI/CD\",\n    \"Backend Architecture\"\n  ],\n  \"critical_skills\": [\n    \"Python\",\n    \"FastAPI\"\n  ],\n  \"education_requirements\": [],\n  \"certification_requirements\": []\n}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        608,
+        -128
+      ],
+      "id": "913fdf4d-dfd6-466b-8590-e02bb0a1febd",
+      "name": "Structured JD Requirements"
+    },
+    {
+      "parameters": {
+        "jsCode": "function normalize(value) {\n  return String(value ?? \"\").trim().toLowerCase().replace(/[._-]/g, \" \").replace(/\\s+/g, \" \");\n}\n\nfunction safeArray(value) {\n  return Array.isArray(value) ? value : [];\n}\n\nfunction safeText(value, fallback = \"N/A\") {\n  if (value === null || value === undefined) return fallback;\n  const text = String(value).trim();\n  return text || fallback;\n}\n\nfunction numberValue(value, fallback = 0) {\n  if (value === null || value === undefined) return fallback;\n  const parsed = Number(String(value).replace(/[^0-9.]/g, \"\"));\n  return Number.isFinite(parsed) ? parsed : fallback;\n}\n\nfunction safePhone(value) {\n  if (value === null || value === undefined || String(value).trim() === \"\") return \"N/A\";\n  let phone = String(value).trim().replace(/^'+/, \"\");\n  if (phone.startsWith(\"=\")) phone = phone.substring(1).trim();\n  return \"'\" + phone;\n}\n\n// Read Current Item\nconst currentData = $input.first().json;\nlet ai = currentData.output && typeof currentData.output === \"object\" ? currentData.output : currentData;\n\nlet jd = {};\ntry {\n  const jdData = $('AI JD Analyzer').first().json;\n  jd = jdData.output && typeof jdData.output === \"object\" ? jdData.output : jdData;\n} catch (error) {\n  jd = {};\n}\n\n// Extract Candidates Data safely\nconst candidateName = safeText(ai.candidate_name, \"N/A\");\nconst email = safeText(ai.email, \"N/A\");\nconst phone = safePhone(ai.phone);\nconst experienceYears = numberValue(ai.experience_years, 0);\nconst education = safeText(ai.education, \"Not Specified\");\nconst certifications = safeArray(ai.certifications);\nconst primaryBackground = safeText(ai.primary_background, \"N/A\");\nconst primaryStackProficiency = safeText(ai.primary_stack_proficiency || ai.python_proficiency, \"None\");\nconst alternativeRole = safeText(ai.alternative_role_fit, \"N/A\");\n\n// Read JD Requirements\nconst appliedRole = safeText(jd.role, \"Python Backend Developer\");\nconst minimumExperience = numberValue(jd.minimum_experience_years, 5);\n\nfunction uniqueSkills(skills) {\n  const result = [];\n  for (const skill of safeArray(skills)) {\n    const clean = safeText(skill, \"\");\n    if (!clean) continue;\n    if (!result.some(e => normalize(e) === normalize(clean))) {\n      result.push(clean);\n    }\n  }\n  return result;\n}\n\nconst cleanRequiredSkills = uniqueSkills(jd.required_skills?.length ? jd.required_skills : [\"Python\", \"FastAPI\", \"SQL\", \"REST APIs\", \"Docker\", \"AWS\", \"Git\"]);\nconst cleanPreferredSkills = uniqueSkills(jd.preferred_skills?.length ? jd.preferred_skills : [\"PostgreSQL\", \"AWS EC2\", \"AWS S3\", \"Linux\", \"CI/CD\", \"Backend Architecture\"]);\nconst cleanCriticalSkills = uniqueSkills(jd.critical_skills?.length ? jd.critical_skills : [\"Python\", \"FastAPI\"]);\n\nconst skillAudit = safeArray(ai.skill_audit);\n\nfunction findAuditItem(skillName) {\n\n  const target =\n    normalize(skillName);\n\n  return skillAudit.find(item => {\n\n    const itemSkill =\n      normalize(item?.skill);\n\n    return itemSkill === target;\n\n  });\n\n}\n\n// 1. Audit Required Skills\nconst matchedSkills = [];\nconst partialSkills = [];\nconst missingSkills = [];\nconst skillEvidence = [];\n\nfor (const reqSkill of cleanRequiredSkills) {\n  const auditItem = findAuditItem(reqSkill);\n  const status = String(auditItem?.status || \"MISSING\").trim().toUpperCase();\n  const evidence = safeText(auditItem?.evidence, `No evidence of ${reqSkill} found in the resume.`);\n\n  skillEvidence.push(`${reqSkill}: ${status} — ${evidence}`);\n\n  if (status === \"MATCHED\") matchedSkills.push(reqSkill);\n  else if (status === \"PARTIAL\") partialSkills.push(reqSkill);\n  else missingSkills.push(reqSkill);\n}\n\n// 2. Audit Critical Skills\nconst criticalGaps = [];\nconst partialCriticalSkills = [];\nconst matchedCriticalSkills = [];\n\nfor (const critSkill of cleanCriticalSkills) {\n  const auditItem = findAuditItem(critSkill);\n  const status = String(auditItem?.status || \"MISSING\").trim().toUpperCase();\n\n  if (status === \"MATCHED\") matchedCriticalSkills.push(critSkill);\n  else if (status === \"PARTIAL\") partialCriticalSkills.push(critSkill);\n  else criticalGaps.push(critSkill);\n}\n\n// 3. Audit Preferred Skills\nconst preferredMatched = [];\nconst preferredPartial = [];\nconst preferredMissing = [];\n\nfor (const prefSkill of cleanPreferredSkills) {\n  const auditItem = findAuditItem(prefSkill);\n  const status = String(auditItem?.status || \"MISSING\").trim().toUpperCase();\n\n  if (status === \"MATCHED\") preferredMatched.push(prefSkill);\n  else if (status === \"PARTIAL\") preferredPartial.push(prefSkill);\n  else preferredMissing.push(prefSkill);\n}\n\n// 4. Scoring Engine\nconst WEIGHT_REQUIRED = 50;\nconst WEIGHT_EXPERIENCE = 25;\nconst WEIGHT_CRITICAL = 15;\nconst WEIGHT_PREFERRED = 10;\n\n// Required Skill Score\nlet requiredSkillScore = 0;\nif (cleanRequiredSkills.length > 0) {\n  const points = matchedSkills.length + (partialSkills.length * 0.5);\n  requiredSkillScore = (points / cleanRequiredSkills.length) * WEIGHT_REQUIRED;\n}\n\n// Experience Score\nlet experienceScore = 0;\nif (minimumExperience > 0) {\n  experienceScore = Math.min(WEIGHT_EXPERIENCE, (experienceYears / minimumExperience) * WEIGHT_EXPERIENCE);\n} else {\n  experienceScore = WEIGHT_EXPERIENCE;\n}\n\n// Critical Score\nlet criticalScore = 0;\nif (cleanCriticalSkills.length > 0) {\n  const points = matchedCriticalSkills.length + (partialCriticalSkills.length * 0.5);\n  criticalScore = (points / cleanCriticalSkills.length) * WEIGHT_CRITICAL;\n} else {\n  criticalScore = WEIGHT_CRITICAL;\n}\n\n// Preferred Score\nlet preferredScore = 0;\nif (cleanPreferredSkills.length > 0) {\n  const points = preferredMatched.length + (preferredPartial.length * 0.5);\n  preferredScore = (points / cleanPreferredSkills.length) * WEIGHT_PREFERRED;\n} else {\n  preferredScore = WEIGHT_PREFERRED;\n}\n\nlet overallScore = Math.round(requiredSkillScore + experienceScore + criticalScore + preferredScore);\noverallScore = Math.max(0, Math.min(100, overallScore));\n\n// 5. Decision Engine\nlet recommendation = \"Hold\";\nlet risk = \"Medium\";\nconst criticalGapCount = criticalGaps.length;\n\nif (criticalGapCount >= 2) {\n  recommendation = \"Reject\";\n  risk = \"High\";\n} else if (criticalGapCount === 1) {\n  if (overallScore >= 65) {\n    recommendation = \"Interview\";\n    risk = \"Medium\";\n  } else {\n    recommendation = \"Reject\";\n    risk = \"High\";\n  }\n} else {\n  if (overallScore >= 85) {\n    recommendation = \"Strong Hire\";\n    risk = \"Low\";\n  } else if (overallScore >= 70) {\n    recommendation = \"Interview\";\n    risk = \"Medium\";\n  } else if (overallScore >= 55) {\n    recommendation = \"Hold\";\n    risk = \"Medium\";\n  } else {\n    recommendation = \"Reject\";\n    risk = \"High\";\n  }\n}\n\n// 6. Summary Build\nconst summaryParts = [];\nif (matchedSkills.length > 0) summaryParts.push(`Strong evidence in ${matchedSkills.join(\", \")}`);\nif (partialSkills.length > 0) summaryParts.push(`Partial exposure in ${partialSkills.join(\", \")}`);\nif (missingSkills.length > 0) summaryParts.push(`Key gaps include ${missingSkills.join(\", \")}`);\nsummaryParts.push(`${experienceYears} years of relevant experience against a ${minimumExperience}-year requirement`);\n\nlet decisionText = \"\";\nif (recommendation === \"Strong Hire\") {\n  decisionText = \"The candidate shows strong alignment with core requirements.\";\n} else if (recommendation === \"Interview\") {\n  decisionText = criticalGapCount > 0 \n    ? `The profile justifies an interview, but ${criticalGaps.join(\", \")} requires validation.`\n    : \"The candidate has enough relevant alignment to justify an interview.\";\n} else if (recommendation === \"Hold\") {\n  decisionText = \"The profile requires secondary review before proceeding.\";\n} else {\n  decisionText = \"The candidate lacks alignment with core requirements.\";\n}\n\nconst hrSummary = `${summaryParts.join(\". \")}. Overall alignment score is ${overallScore}%. ${decisionText}`;\nconst interviewQuestions = safeArray(ai.interview_questions);\nconst formattedQuestions = interviewQuestions.length > 0 \n  ? interviewQuestions.slice(0, 5).map((q, i) => `${i + 1}. ${String(q).trim()}`).join(\"\\n\") \n  : \"N/A\";\n\n// Return Data\nreturn [{\n  json: {\n    \"Candidate\": candidateName,\n    \"Email\": email,\n    \"Phone\": phone,\n    \"Experience\": experienceYears > 0 ? `${experienceYears} Years` : \"Not Specified\",\n    \"Education\": education,\n    \"Certifications\": certifications.length > 0 ? certifications.join(\", \") : \"None\",\n    \"Primary Background\": primaryBackground,\n    \"Primary Stack Proficiency\": primaryStackProficiency,\n    \"Matched Skills\": matchedSkills.length > 0 ? matchedSkills.join(\", \") : \"None\",\n    \"Partial Skills\": partialSkills.length > 0 ? partialSkills.join(\", \") : \"None\",\n    \"Missing Skills\": missingSkills.length > 0 ? missingSkills.join(\", \") : \"None\",\n    \"Critical Gaps\": criticalGaps.length > 0 ? criticalGaps.join(\", \") : \"None\",\n    \"Preferred Skills Matched\": preferredMatched.length > 0 ? preferredMatched.join(\", \") : \"None\",\n    \"Skill Evidence\": skillEvidence.length > 0 ? skillEvidence.join(\" | \") : \"N/A\",\n    \"Match Percentage\": `${overallScore}%`,\n    \"Overall Score\": overallScore,\n    \"Risk Level\": risk,\n    \"Recommendation\": recommendation,\n    \"Applied Role\": appliedRole,\n    \"Alternative Role Fit\": alternativeRole,\n    \"HR Decision Summary\": hrSummary,\n    \"Interview Questions\": formattedQuestions,\n    \"Status\": \"Pending HR Review\",\n    \"Reviewed On\": new Date().toISOString().split(\"T\")[0]\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1104,
+        -336
+      ],
+      "id": "12ac85dc-0600-48ee-a1cc-1cc54efc19fd",
+      "name": "Code in JavaScript1"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list",
+          "cachedResultName": "gpt-4o-mini"
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        368,
+        -128
+      ],
+      "id": "e1763da0-1994-457d-8e0f-604054b50f51",
+      "name": "JD Auditor",
+      "credentials": {
+        "openAiApi": {
+          "id": "63JHN9u8uhhDSAcx",
+          "name": "OpenAI account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=CRITICAL INSTRUCTION:\nYou are a Resume Evidence Extraction Engine.\nYour ONLY job is to extract factual details and audit skills against the provided Job Description.\n\nReturn ONLY valid JSON matching the parser schema. \nDo NOT calculate scores, recommendations, or risk levels.\n\n==================================================\nJOB REQUIREMENTS TO AUDIT\n==================================================\nRole:\n{{ $('AI JD Analyzer').item.json.output?.role || $('AI JD Analyzer').item.json.role }}\n\nRequired Skills:\n{{ JSON.stringify($('AI JD Analyzer').item.json.output?.required_skills || $('AI JD Analyzer').item.json.required_skills) }}\n\nPreferred Skills:\n{{ JSON.stringify($('AI JD Analyzer').item.json.output?.preferred_skills || $('AI JD Analyzer').item.json.preferred_skills) }}\n\nCritical Skills:\n{{ JSON.stringify($('AI JD Analyzer').item.json.output?.critical_skills || $('AI JD Analyzer').item.json.critical_skills) }}\n\n==================================================\nRULES\n==================================================\n1. Generate ONE skill_audit object for EVERY skill listed in Required Skills AND Preferred Skills.\n2. Status MUST be \"MATCHED\", \"PARTIAL\", or \"MISSING\".\n3. If a skill is missing, write evidence as: \"No evidence of <skill> found in the resume.\"\n4. primary_stack_proficiency MUST be strictly one of: \"Primary Stack\", \"Working/Project\", \"Basic/Automation\", \"None\".\n5. Generate EXACTLY 5 interview questions targeting candidate background/gaps.\n\n==================================================\nRESUME TEXT\n==================================================\n{{ $('Extract from File').item.json.text || $('Extract from File').item.json.data || \"No text\" }}",
+        "hasOutputParser": true,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        784,
+        -336
+      ],
+      "id": "61a1ab20-3651-4f5b-99f2-9915ae40c31b",
+      "name": "Resume Analyzer Agent"
+    },
+    {
+      "parameters": {
+        "schemaType": "manual",
+        "inputSchema": "{\n  \"type\": \"object\",\n  \"properties\": {\n    \"candidate_name\": { \"type\": \"string\" },\n    \"email\": { \"type\": \"string\" },\n    \"phone\": { \"type\": \"string\" },\n    \"experience_years\": { \"type\": \"number\" },\n    \"education\": { \"type\": \"string\" },\n    \"certifications\": {\n      \"type\": \"array\",\n      \"items\": { \"type\": \"string\" }\n    },\n    \"primary_stack_proficiency\": { \"type\": \"string\" },\n    \"primary_background\": { \"type\": \"string\" },\n    \"alternative_role_fit\": { \"type\": \"string\" },\n    \"skill_audit\": {\n      \"type\": \"array\",\n      \"items\": {\n        \"type\": \"object\",\n        \"properties\": {\n          \"skill\": { \"type\": \"string\" },\n          \"status\": { \"type\": \"string\" },\n          \"evidence\": { \"type\": \"string\" }\n        }\n      }\n    },\n    \"interview_questions\": {\n      \"type\": \"array\",\n      \"items\": { \"type\": \"string\" }\n    }\n  }\n}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        944,
+        -112
+      ],
+      "id": "422ab103-a9c8-4280-bc35-1e3c30b617a4",
+      "name": "Structured Resume Analyzer"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list",
+          "cachedResultName": "gpt-4o-mini"
+        },
+        "builtInTools": {},
+        "options": {
+          "textFormat": {
+            "textOptions": {
+              "type": "json_object"
+            }
+          },
+          "temperature": 0.1
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        768,
+        -112
+      ],
+      "id": "711f9fd2-bc55-4af6-ad0a-bc121cc65011",
+      "name": "Resume Analyzer Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "63JHN9u8uhhDSAcx",
+          "name": "OpenAI account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "Extract from File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract from File": {
+      "main": [
+        [
+          {
+            "node": "AI JD Analyzer",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured JD Requirements": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "AI JD Analyzer",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI JD Analyzer": {
+      "main": [
+        [
+          {
+            "node": "Resume Analyzer Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "JD Auditor": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI JD Analyzer",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript1": {
+      "main": [
+        [
+          {
+            "node": "Append row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Resume Analyzer Agent": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Resume Analyzer": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "Resume Analyzer Agent",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Resume Analyzer Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Resume Analyzer Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "de22d79b-7a82-4a9f-932c-159d587fad3c",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "8bf29fe464bb8cd02a1ac56721c6ca3d51cb4ba18d6562b71ce2f156ceee241f"
+  },
+  "nodeGroups": [],
+  "id": "4nj22CjRBNvQlmCl",
+  "tags": []
+}
