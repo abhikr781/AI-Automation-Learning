@@ -1,0 +1,338 @@
+{
+  "name": "Day 25 - Financial Report Analyzer",
+  "nodes": [
+    {
+      "parameters": {
+        "operation": "pdf",
+        "binaryPropertyName": "upload",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1.1,
+      "position": [
+        16,
+        16
+      ],
+      "id": "401f38d0-859e-4cde-87f4-d8be568af2b3",
+      "name": "Extract from File"
+    },
+    {
+      "parameters": {
+        "formTitle": "Annual Data",
+        "formDescription": "Annual Data",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "upload",
+              "fieldType": "file"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.6,
+      "position": [
+        -160,
+        16
+      ],
+      "id": "914175bb-e160-4fe6-9935-9872fb9ddefd",
+      "name": "On form submission",
+      "webhookId": "131983e6-dae0-4b97-bbe0-ecfa1278b3e5"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=You are a Financial Data Extraction Engine. Extract the financial numbers for Current Period and Prior Period from the document text provided below.\n\nRULES:\n1. Extract numerical values ONLY. Convert human terms like \"120M\" or \"120 Million\" into pure numbers like 120000000.\n2. EXTRACTION MANDATE: If a metric is present in the source text, you MUST extract its exact numeric value.\n3. MISSING NUMERIC DATA: If any financial metric is missing or NOT explicitly mentioned in the document, OMIT that key/property entirely from the JSON output. Do NOT write 0 or null for missing metrics—simply leave the field out.\n4. EXPLICIT ZERO: Output 0 ONLY if the source document explicitly states the value is $0 or zero.\n5. MISSING TEXT DATA: If non-numeric fields (like company_name, report_period, currency) are missing, return \"N/A\".\n6. Do NOT perform any math calculations, ratio estimations, or adjustments.\n\nDOCUMENT TEXT:\n{{ $json.text }}",
+        "hasOutputParser": true,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        224,
+        16
+      ],
+      "id": "4656ab0b-1c59-4eaa-b0ab-029aecd0f00c",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "schemaType": "manual",
+        "inputSchema": "={\n  \"type\": \"object\",\n  \"properties\": {\n    \"company_name\": { \"type\": \"string\" },\n    \"report_period\": { \"type\": \"string\" },\n    \"currency\": { \"type\": \"string\" },\n    \"income_statement\": {\n      \"type\": \"object\",\n      \"properties\": {\n        \"revenue\": { \"type\": \"object\", \"properties\": { \"current\": { \"type\": \"number\" }, \"prior\": { \"type\": \"number\" } } },\n        \"cost_of_revenue\": { \"type\": \"object\", \"properties\": { \"current\": { \"type\": \"number\" }, \"prior\": { \"type\": \"number\" } } },\n        \"gross_profit\": { \"type\": \"object\", \"properties\": { \"current\": { \"type\": \"number\" }, \"prior\": { \"type\": \"number\" } } },\n        \"operating_expenses\": { \"type\": \"object\", \"properties\": { \"current\": { \"type\": \"number\" }, \"prior\": { \"type\": \"number\" } } },\n        \"operating_income\": { \"type\": \"object\", \"properties\": { \"current\": { \"type\": \"number\" }, \"prior\": { \"type\": \"number\" } } },\n        \"net_income\": { \"type\": \"object\", \"properties\": { \"current\": { \"type\": \"number\" }, \"prior\": { \"type\": \"number\" } } }\n      }\n    },\n    \"balance_sheet\": {\n      \"type\": \"object\",\n      \"properties\": {\n        \"cash_and_equivalents\": { \"type\": \"object\", \"properties\": { \"current\": { \"type\": \"number\" }, \"prior\": { \"type\": \"number\" } } },\n        \"current_assets\": { \"type\": \"object\", \"properties\": { \"current\": { \"type\": \"number\" }, \"prior\": { \"type\": \"number\" } } },\n        \"total_assets\": { \"type\": \"object\", \"properties\": { \"current\": { \"type\": \"number\" }, \"prior\": { \"type\": \"number\" } } },\n        \"current_liabilities\": { \"type\": \"object\", \"properties\": { \"current\": { \"type\": \"number\" }, \"prior\": { \"type\": \"number\" } } },\n        \"total_liabilities\": { \"type\": \"object\", \"properties\": { \"current\": { \"type\": \"number\" }, \"prior\": { \"type\": \"number\" } } },\n        \"total_equity\": { \"type\": \"object\", \"properties\": { \"current\": { \"type\": \"number\" }, \"prior\": { \"type\": \"number\" } } },\n        \"total_debt\": { \"type\": \"object\", \"properties\": { \"current\": { \"type\": \"number\" }, \"prior\": { \"type\": \"number\" } } }\n      }\n    },\n    \"cash_flow\": {\n      \"type\": \"object\",\n      \"properties\": {\n        \"operating_cash_flow\": { \"type\": \"object\", \"properties\": { \"current\": { \"type\": \"number\" }, \"prior\": { \"type\": \"number\" } } },\n        \"capital_expenditure\": { \"type\": \"object\", \"properties\": { \"current\": { \"type\": \"number\" }, \"prior\": { \"type\": \"number\" } } },\n        \"investing_cash_flow\": { \"type\": \"object\", \"properties\": { \"current\": { \"type\": \"number\" }, \"prior\": { \"type\": \"number\" } } },\n        \"financing_cash_flow\": { \"type\": \"object\", \"properties\": { \"current\": { \"type\": \"number\" }, \"prior\": { \"type\": \"number\" } } },\n        \"free_cash_flow\": { \"type\": \"object\", \"properties\": { \"current\": { \"type\": \"number\" }, \"prior\": { \"type\": \"number\" } } }\n      }\n    }\n  }\n}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        400,
+        224
+      ],
+      "id": "99b03002-67aa-40e6-a15a-b811e7fbb437",
+      "name": "Structured Output Parser"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list",
+          "cachedResultName": "gpt-4o-mini"
+        },
+        "builtInTools": {},
+        "options": {
+          "textFormat": {
+            "textOptions": {
+              "type": "json_object"
+            }
+          }
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        80,
+        224
+      ],
+      "id": "76c0b1be-09ea-4fc7-a1a2-5c133926443d",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "63JHN9u8uhhDSAcx",
+          "name": "OpenAI account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Get input data from previous node\nconst rawData = $input.item.json.output || $input.item.json;\n\nconst is = rawData.income_statement || {};\nconst bs = rawData.balance_sheet || {};\nconst cf = rawData.cash_flow || {};\n\n// Helper: Safe Percentage Calculation\nfunction calcPctChange(current, prior) {\n  if (prior === null || prior === 0 || prior === undefined || current === null || current === undefined) {\n    return null;\n  }\n  return Number((((current - prior) / Math.abs(prior)) * 100).toFixed(2));\n}\n\n// Helper: Safe Division / Ratio Calculation\nfunction calcRatio(numerator, denominator) {\n  if (denominator === null || denominator === 0 || denominator === undefined || numerator === null || numerator === undefined) {\n    return null;\n  }\n  return Number((numerator / denominator).toFixed(2));\n}\n\n// Helper: Safe Margin Calculation (%)\nfunction calcMargin(part, whole) {\n  if (whole === null || whole === 0 || whole === undefined || part === null || part === undefined) {\n    return null;\n  }\n  return Number(((part / whole) * 100).toFixed(2));\n}\n\n// 1. Growth & Change Metrics\nconst growth = {\n  revenue_growth_pct: calcPctChange(is.revenue?.current, is.revenue?.prior),\n  gross_profit_growth_pct: calcPctChange(is.gross_profit?.current, is.gross_profit?.prior),\n  operating_income_growth_pct: calcPctChange(is.operating_income?.current, is.operating_income?.prior),\n  net_income_growth_pct: calcPctChange(is.net_income?.current, is.net_income?.prior),\n  cash_change_pct: calcPctChange(bs.cash_and_equivalents?.current, bs.cash_and_equivalents?.prior),\n  debt_change_pct: calcPctChange(bs.total_debt?.current, bs.total_debt?.prior),\n  operating_cash_flow_growth_pct: calcPctChange(cf.operating_cash_flow?.current, cf.operating_cash_flow?.prior)\n};\n\n// 2. Financial Ratios (Current Period)\nconst ratios_current = {\n  // Profitability Ratios (%)\n  gross_margin_pct: calcMargin(is.gross_profit?.current, is.revenue?.current),\n  operating_margin_pct: calcMargin(is.operating_income?.current, is.revenue?.current),\n  net_margin_pct: calcMargin(is.net_income?.current, is.revenue?.current),\n  \n  // Liquidity Ratios\n  current_ratio: calcRatio(bs.current_assets?.current, bs.current_liabilities?.current),\n  cash_ratio: calcRatio(bs.cash_and_equivalents?.current, bs.current_liabilities?.current),\n  \n  // Leverage Ratios\n  debt_to_equity: calcRatio(bs.total_debt?.current, bs.total_equity?.current),\n  debt_to_assets: calcRatio(bs.total_debt?.current, bs.total_assets?.current),\n  \n  // Efficiency Ratio\n  asset_turnover: calcRatio(is.revenue?.current, bs.total_assets?.current)\n};\n\n// 3. Financial Ratios (Prior Period)\nconst ratios_prior = {\n  gross_margin_pct: calcMargin(is.gross_profit?.prior, is.revenue?.prior),\n  operating_margin_pct: calcMargin(is.operating_income?.prior, is.revenue?.prior),\n  net_margin_pct: calcMargin(is.net_income?.prior, is.revenue?.prior),\n  current_ratio: calcRatio(bs.current_assets?.prior, bs.current_liabilities?.prior),\n  cash_ratio: calcRatio(bs.cash_and_equivalents?.prior, bs.current_liabilities?.prior),\n  debt_to_equity: calcRatio(bs.total_debt?.prior, bs.total_equity?.prior),\n  debt_to_assets: calcRatio(bs.total_debt?.prior, bs.total_assets?.prior),\n  asset_turnover: calcRatio(is.revenue?.prior, bs.total_assets?.prior)\n};\n\n// 4. Margin Shifts (Basis Points / Direct % Point Difference)\nconst ratio_changes = {\n  gross_margin_shift: (ratios_current.gross_margin_pct !== null && ratios_prior.gross_margin_pct !== null) \n    ? Number((ratios_current.gross_margin_pct - ratios_prior.gross_margin_pct).toFixed(2)) : null,\n  operating_margin_shift: (ratios_current.operating_margin_pct !== null && ratios_prior.operating_margin_pct !== null) \n    ? Number((ratios_current.operating_margin_pct - ratios_prior.operating_margin_pct).toFixed(2)) : null,\n  net_margin_shift: (ratios_current.net_margin_pct !== null && ratios_prior.net_margin_pct !== null) \n    ? Number((ratios_current.net_margin_pct - ratios_prior.net_margin_pct).toFixed(2)) : null\n};\n\n// Return Final Structured Model\nreturn {\n  json: {\n    meta: {\n      company_name: rawData.company_name,\n      report_period: rawData.report_period,\n      currency: rawData.currency\n    },\n    raw_financials: rawData,\n    calculated_growth: growth,\n    ratios: {\n      current_period: ratios_current,\n      prior_period: ratios_prior,\n      margin_shifts: ratio_changes\n    }\n  }\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        576,
+        16
+      ],
+      "id": "7b60fdd7-3443-49e3-88c3-51a21ff2f105",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list",
+          "cachedResultName": "gpt-4o-mini"
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        992,
+        240
+      ],
+      "id": "80d0c091-e510-41bd-8398-2e619cf790e1",
+      "name": "OpenAI Chat Model1",
+      "credentials": {
+        "openAiApi": {
+          "id": "63JHN9u8uhhDSAcx",
+          "name": "OpenAI account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=INPUT DATA:\n{{ JSON.stringify($json) }}",
+        "options": {
+          "systemMessage": "=You are an expert AI Financial Analyst. You are provided with a structured financial dataset.\n\nYOUR TASK:\nGenerate a professional, executive-level financial analysis based STRICTLY on the provided JSON data.\n\nCRITICAL FINANCIAL GUARDRAILS:\n1. STRICT NUMERIC ACCURACY: Use ONLY the exact pre-calculated JSON values. Do NOT compute, invent, or alter CapEx, Free Cash Flow, Revenue, or Ratio figures.\n2. MISSING DATA & NULL HANDLING: If a field is missing, null, or marked as \"N/A\" (e.g., Debt, CapEx, or Current Ratio), explicitly state that the metric is unavailable or omitted in the report. NEVER assume missing data equals 0 or invent fictional estimates.\n3. LIQUIDITY GUARDRAIL: If Current Ratio, Current Liabilities, or Cash Flow metrics are missing or null, DO NOT claim a \"favorable liquidity stance\" or \"strong liquidity position\". Instead, state that missing liability or current ratio data limits a complete liquidity assessment (e.g., \"Cash position was $11M, but the absence of current liabilities data limits a full liquidity evaluation.\").\n4. ACCURATE NARRATIVE: Ensure narrative statements directly reflect the data. If revenue or profits declined, do NOT claim the company experienced top-line growth.\n5. SOURCE-OF-TRUTH RULE: Every financial metric mentioned MUST come directly from the provided JSON dataset. If FCF, CapEx, growth percentages, ratios, or risk metrics are present, reproduce those exact values. If a metric is null or missing, do NOT mention a numeric value for that metric.\n6. RISK ALIGNMENT: If the risk engine reports no risk drivers, state \"None identified based on available metrics\" in Key Concerns instead of inventing hypothetical red flags.\n7. Maintain a professional executive tone. No investment advice.\n\nOUTPUT FORMAT REQUIRED:\n\n### Executive Summary\n[1-2 concise paragraphs summarizing performance based purely on available metrics]\n\n### Key Strengths\n- [Bullet points based on positive available metrics; if data is limited, state that clearly]\n\n### Key Concerns\n- [Bullet points of red flags or leverage issues. If no risk drivers were flagged and metrics are clean, state \"No major deterministic risk drivers identified\"]\n\n### Management Attention Areas\n- [Actionable guidance on operational oversight, data completeness, or cash management]\n\n### Narrative Interpretation (\"What Changed?\")\n[A concise narrative explaining the core performance divergence or data limitations]"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        992,
+        16
+      ],
+      "id": "87598daa-2e11-45fa-b942-e9e5f40ce101",
+      "name": "AI Financial Analyst"
+    },
+    {
+      "parameters": {
+        "jsCode": "// 1. Get Financial Data\nconst financialData = $('Trend & Risk Engine').first().json;\n\n// 2. Get AI Agent output\nconst aiInput = $input.item.json;\n\nlet aiResponse = \n  aiInput.output || \n  aiInput.text || \n  aiInput.message?.content || \n  (typeof aiInput === 'string' ? aiInput : \"AI Commentary unavailable.\");\n\n// Clean up AI Response Formatting for Telegram HTML\nlet formattedAiResponse = aiResponse\n  .replace(/### (.*)/g, '\\n<b>🔸 $1</b>')\n  .replace(/## (.*)/g, '\\n<b>🔹 $1</b>')\n  .replace(/\\*\\*(.*?)\\*\\*/g, '<b>$1</b>')\n  .replace(/^- (.*)/gm, '  • $1')                   // Format bullets neatly\n  .replace(/\\n{3,}/g, '\\n\\n')                       // Remove excessive line breaks\n  .trim();\n\n// 3. Extracted Financial Metrics\nconst meta = financialData.meta || {};\nconst raw = financialData.raw_financials || {};\nconst is = raw.income_statement || {};\nconst bs = raw.balance_sheet || {};\nconst cf = raw.cash_flow || {};\nconst growth = financialData.calculated_growth || {};\nconst ratios = financialData.ratios?.current_period || {};\nconst risk = financialData.risk_engine || {};\n\n// ----------------------------------------------------\n// STRICT FORMATTING HELPERS\n// ----------------------------------------------------\nconst isValid = (val) => val !== null && val !== undefined && !isNaN(val) && typeof val === 'number';\n\n// Money: Output '$75.0M' if valid, strictly 'N/A' (without $) if invalid\nconst fmtMoney = (val) => isValid(val) ? `$${(val / 1e6).toFixed(1)}M` : 'N/A';\n\n// Growth: Output ' (<code>+7.14%</code>)' if valid, strictly EMPTY STRING \"\" if invalid (Prevents +null% bug)\nconst fmtGrowth = (val) => isValid(val) ? ` (<code>${val >= 0 ? '+' : ''}${val}%</code>)` : '';\n\n// Ratio & Percentage Helpers (Prevents N/Ax and N/A% bug)\nconst fmtPct = (val) => isValid(val) ? `<code>${val}%</code>` : '<code>N/A</code>';\nconst fmtRatio = (val) => isValid(val) ? `<code>${val}x</code>` : '<code>N/A</code>';\n\n// Risk Emoji\nconst riskEmoji = risk.overall_risk_level === 'High' ? '🔴' : risk.overall_risk_level === 'Medium' ? '🟡' : '🟢';\n\n// Deterministic Risk Drivers List (Fallback to \"• None identified\")\nconst riskDriversList = (Array.isArray(risk.risk_drivers) && risk.risk_drivers.length > 0)\n  ? risk.risk_drivers.map(r => `• ${r}`).join('\\n')\n  : '• None identified';\n\n// ----------------------------------------------------\n// 4. Assemble Telegram Message\n// ----------------------------------------------------\nconst telegramHTML = `\n📊 <b>EXECUTIVE FINANCIAL BRIEF</b>\n━━━━━━━━━━━━━━━━━━━━━━━━━━\n🏢 <b>Company:</b> ${meta.company_name || 'N/A'}\n📅 <b>Period:</b> ${meta.report_period || 'N/A'} (${meta.currency || 'USD'})\n⚠️ <b>Health:</b> ${riskEmoji} <b>${risk.overall_risk_level || 'N/A'} Risk Level</b>\n\n📈 <b>KEY FINANCIAL METRICS</b>\n• <b>Revenue:</b> ${fmtMoney(is.revenue?.current)}${fmtGrowth(growth.revenue_growth_pct)}\n• <b>Net Income:</b> ${fmtMoney(is.net_income?.current)}${fmtGrowth(growth.net_income_growth_pct)}\n• <b>Net Margin:</b> ${fmtPct(ratios.net_margin_pct ?? ratios.net_margin)}\n• <b>Op. Cash Flow:</b> ${fmtMoney(cf.operating_cash_flow?.current)}${fmtGrowth(growth.operating_cash_flow_growth_pct)}\n• <b>Total Debt:</b> ${fmtMoney(bs.total_debt?.current)}${fmtGrowth(growth.debt_change_pct)}\n• <b>Debt / Equity:</b> ${fmtRatio(ratios.debt_to_equity)}\n• <b>Current Ratio:</b> ${fmtRatio(ratios.current_ratio)}\n\n🚨 <b>DETERMINISTIC RISK DRIVERS</b>\n${riskDriversList}\n\n━━━━━━━━━━━━━━━━━━━━━━━━━━\n🤖 <b>AI ANALYST COMMENTARY</b>\n${formattedAiResponse}\n`.trim();\n\nreturn {\n  json: {\n    telegram_html: telegramHTML\n  }\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1312,
+        16
+      ],
+      "id": "d4cdbf50-da61-4ac0-89b9-e8273e94643c",
+      "name": "Code in JavaScript1"
+    },
+    {
+      "parameters": {
+        "jsCode": "const data = $input.item.json;\nconst growth = data.calculated_growth || {};\nconst ratiosCurrent = data.ratios?.current_period || {};\nconst shifts = data.ratios?.margin_shifts || {};\nconst rawCF = data.raw_financials?.cash_flow || {};\n\n// Helper: Check valid numeric value (Excludes null, undefined, NaN)\nconst isValid = (val) => val !== null && val !== undefined && !isNaN(val) && typeof val === 'number';\n\n// Helper: Safe Absolute Extraction\nconst getAbsValue = (val) => isValid(val) ? Math.abs(val) : null;\n\n// ----------------------------------------------------\n// 0. DETERMINISTIC CAPEX & FCF CALCULATIONS\n// ----------------------------------------------------\n// IMPORTANT:\n// FCF = Operating Cash Flow - Capital Expenditure\n//\n// Do NOT use Investing Cash Flow as CapEx.\n// Investing Cash Flow may contain acquisitions,\n// investments, asset sales, or other investing activity.\n//\n// Do NOT trust AI-generated/raw FCF when OCF + CapEx\n// are available. Calculate FCF deterministically.\n\nconst ocfCurrent = isValid(rawCF.operating_cash_flow?.current)\n  ? rawCF.operating_cash_flow.current\n  : null;\n\nconst ocfPrior = isValid(rawCF.operating_cash_flow?.prior)\n  ? rawCF.operating_cash_flow.prior\n  : null;\n\n// ----------------------------------------------------\n// CAPEX\n// ----------------------------------------------------\nlet capexCurrent = null;\nif (isValid(rawCF.capital_expenditure?.current)) {\n  capexCurrent = getAbsValue(rawCF.capital_expenditure.current);\n} else if (isValid(rawCF.capex?.current)) {\n  capexCurrent = getAbsValue(rawCF.capex.current);\n}\n\nlet capexPrior = null;\nif (isValid(rawCF.capital_expenditure?.prior)) {\n  capexPrior = getAbsValue(rawCF.capital_expenditure.prior);\n} else if (isValid(rawCF.capex?.prior)) {\n  capexPrior = getAbsValue(rawCF.capex.prior);\n}\n\n// ----------------------------------------------------\n// FREE CASH FLOW\n// ----------------------------------------------------\nlet fcfCurrent = null;\nif (ocfCurrent !== null && capexCurrent !== null) {\n  fcfCurrent = ocfCurrent - capexCurrent;\n}\n\nlet fcfPrior = null;\nif (ocfPrior !== null && capexPrior !== null) {\n  fcfPrior = ocfPrior - capexPrior;\n}\n\n// ----------------------------------------------------\n// FCF GROWTH\n// ----------------------------------------------------\n// Only calculate percentage growth when prior FCF is\n// a valid non-zero number.\n//\n// If prior FCF is zero or unavailable, return N/A\n// instead of generating misleading percentages.\n\nlet fcfGrowthPct = null;\nif (\n  fcfCurrent !== null &&\n  fcfPrior !== null &&\n  fcfPrior !== 0\n) {\n  fcfGrowthPct = Number(\n    (((fcfCurrent - fcfPrior) / Math.abs(fcfPrior)) * 100).toFixed(2)\n  );\n}\n\n// ----------------------------------------------------\n// UPDATED CASH FLOW\n// ----------------------------------------------------\nconst updatedCashFlow = {\n  ...rawCF,\n\n  capital_expenditure: {\n    current: capexCurrent,\n    prior: capexPrior\n  },\n\n  free_cash_flow: {\n    current: fcfCurrent,\n    prior: fcfPrior\n  }\n};\n\n// ----------------------------------------------------\n// UPDATED GROWTH\n// ----------------------------------------------------\nconst updatedGrowth = {\n  ...growth,\n  free_cash_flow_growth_pct: fcfGrowthPct\n};\n\n// ----------------------------------------------------\n// 1. Trend Evaluation\n// ----------------------------------------------------\nconst trends = {\n  revenue_trend: isValid(updatedGrowth.revenue_growth_pct) ? (updatedGrowth.revenue_growth_pct > 0 ? \"Positive\" : (updatedGrowth.revenue_growth_pct < 0 ? \"Negative\" : \"Flat\")) : \"N/A\",\n  profitability_trend: isValid(updatedGrowth.net_income_growth_pct) ? (updatedGrowth.net_income_growth_pct > 0 && (shifts.net_margin_shift ?? 0) >= 0 ? \"Positive\" : (updatedGrowth.net_income_growth_pct < 0 ? \"Negative\" : \"Mixed/Caution\")) : \"N/A\",\n  cash_flow_trend: (fcfGrowthPct !== null && fcfGrowthPct >= 0) || (isValid(updatedGrowth.operating_cash_flow_growth_pct) && updatedGrowth.operating_cash_flow_growth_pct >= 0) ? \"Positive\" : \"Negative\",\n  leverage_trend: (isValid(updatedGrowth.debt_change_pct) && updatedGrowth.debt_change_pct > 15) || (isValid(ratiosCurrent.debt_to_equity) && ratiosCurrent.debt_to_equity > 1.2) ? \"Caution\" : \"Stable\",\n  liquidity_trend: isValid(ratiosCurrent.current_ratio) ? (ratiosCurrent.current_ratio < 1.0 ? \"High Risk\" : (ratiosCurrent.current_ratio < 1.5 ? \"Caution\" : \"Healthy\")) : \"N/A\"\n};\n\n// ----------------------------------------------------\n// 2. Risk Drivers Engine (Rules-based Detection)\n// ----------------------------------------------------\nconst riskDrivers = [];\n\n// Leverage / Debt Rules\nif (isValid(updatedGrowth.debt_change_pct) && updatedGrowth.debt_change_pct > 20) {\n  riskDrivers.push(`Total Debt increased significantly (+${updatedGrowth.debt_change_pct}%)`);\n}\nif (isValid(ratiosCurrent.debt_to_equity) && ratiosCurrent.debt_to_equity > 1.5) {\n  riskDrivers.push(`High Debt-to-Equity ratio (${ratiosCurrent.debt_to_equity}x)`);\n}\n\n// Cash Flow & Liquidity Rules\nif (isValid(updatedGrowth.operating_cash_flow_growth_pct) && updatedGrowth.operating_cash_flow_growth_pct < 0) {\n  const isGrowing = (isValid(updatedGrowth.revenue_growth_pct) && updatedGrowth.revenue_growth_pct > 0) || (isValid(updatedGrowth.net_income_growth_pct) && updatedGrowth.net_income_growth_pct > 0);\n  const tailText = isGrowing ? \" despite revenue/profit growth\" : \"\";\n  riskDrivers.push(`Operating Cash Flow declined (${updatedGrowth.operating_cash_flow_growth_pct}%)${tailText}`);\n}\nif (isValid(fcfGrowthPct) && fcfGrowthPct < 0 && fcfCurrent !== null) {\n  riskDrivers.push(`Free Cash Flow declined (${fcfGrowthPct}%) to $${(fcfCurrent / 1e6).toFixed(1)}M due to heavy CapEx/operating pressures`);\n}\nif (isValid(updatedGrowth.cash_change_pct) && updatedGrowth.cash_change_pct < -15) {\n  riskDrivers.push(`Cash reserves depleted significantly (${updatedGrowth.cash_change_pct}%)`);\n}\n\n// Current Ratio Rule (Strict Check: Only trigger if valid number exists)\nif (isValid(ratiosCurrent.current_ratio) && ratiosCurrent.current_ratio < 1.2) {\n  riskDrivers.push(`Current Ratio is tight (${ratiosCurrent.current_ratio}x)`);\n}\n\n// Profitability / Margin Rules\nif (isValid(shifts.net_margin_shift) && shifts.net_margin_shift < -1.0) {\n  riskDrivers.push(`Net Margin compressed by ${Math.abs(shifts.net_margin_shift)} percentage points`);\n}\nif (isValid(shifts.gross_margin_shift) && shifts.gross_margin_shift < -2.0) {\n  riskDrivers.push(`Gross Margin declined by ${Math.abs(shifts.gross_margin_shift)} percentage points`);\n}\n\n// ----------------------------------------------------\n// 3. Overall Risk Level Assignment\n// ----------------------------------------------------\nlet overallRisk = \"Low\";\nif (\n  riskDrivers.length >= 3 || \n  (isValid(ratiosCurrent.debt_to_equity) && ratiosCurrent.debt_to_equity > 2.0) || \n  (isValid(ratiosCurrent.current_ratio) && ratiosCurrent.current_ratio < 1.0)\n) {\n  overallRisk = \"High\";\n} else if (riskDrivers.length >= 1) {\n  overallRisk = \"Medium\";\n}\n\nreturn {\n  json: {\n    ...data,\n    raw_financials: {\n      ...data.raw_financials,\n      cash_flow: updatedCashFlow\n    },\n    calculated_growth: updatedGrowth,\n    trends: trends,\n    risk_engine: {\n      overall_risk_level: overallRisk,\n      risk_driver_count: riskDrivers.length,\n      risk_drivers: riskDrivers\n    }\n  }\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        784,
+        16
+      ],
+      "id": "eb2723a7-7d80-42db-b1ce-cacb126b41e9",
+      "name": "Trend & Risk Engine"
+    },
+    {
+      "parameters": {
+        "chatId": "1239935064",
+        "text": "={{ $json.telegram_html }}",
+        "additionalFields": {
+          "parse_mode": "HTML"
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1504,
+        16
+      ],
+      "id": "45cffef7-e3e5-44da-8c1c-4feeb84f7bce",
+      "name": "Send a text message",
+      "webhookId": "042a7c24-fa80-4ec3-a6dc-ba73be6aba3b",
+      "credentials": {
+        "telegramApi": {
+          "id": "svR1CV7IfKrg6pyR",
+          "name": "Telegram account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "On form submission": {
+      "main": [
+        [
+          {
+            "node": "Extract from File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract from File": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Trend & Risk Engine",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Financial Analyst",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Financial Analyst": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Trend & Risk Engine": {
+      "main": [
+        [
+          {
+            "node": "AI Financial Analyst",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript1": {
+      "main": [
+        [
+          {
+            "node": "Send a text message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "48458e0c-3bbe-430a-8845-c3fe019c8340",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "8bf29fe464bb8cd02a1ac56721c6ca3d51cb4ba18d6562b71ce2f156ceee241f"
+  },
+  "nodeGroups": [],
+  "id": "l86MySnP8jnidjrS",
+  "tags": []
+}
